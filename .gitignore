@@ -1,0 +1,29 @@
+# ---- personal configuration (keep your filters private) ----
+config.yaml
+config.yml
+config.json
+
+# ---- your Instagram export & all derived/personal data ----
+*.zip
+data/
+output/
+figures/
+
+# ---- python / env ----
+.venv/
+venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# ---- model / HF caches ----
+.cache/
+*.safetensors
+
+# ---- os / editor ----
+.DS_Store
+.idea/
+.vscode/
+
+# ---- local tooling state ----
+.claude/

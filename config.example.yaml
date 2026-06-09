@@ -1,0 +1,50 @@
+# ============================================================================
+#  InstagramAnalysis — configuration TEMPLATE
+#
+#  Quick start:
+#     cp config.example.yaml config.yaml      # your personal copy (gitignored)
+#     # edit config.yaml, then:
+#     .venv/bin/python scripts/03_analysis.py && .venv/bin/python scripts/04_build_dashboard.py
+#
+#  This file is the committed, shareable template (no personal data). Your own
+#  config.yaml overrides it and is NOT pushed to git. Everything here is OPTIONAL —
+#  delete a key to use its default. The pipeline runs fine with no config.yaml at all.
+# ============================================================================
+
+# --- People / chats to EXCLUDE completely ------------------------------------
+# Case-insensitive substring match against chat title, participants and sender.
+# A direct chat (DM) with a matched person is removed entirely; in group chats
+# only that person's own messages are removed (the group is kept).
+exclude_people: []
+#   - "some name"
+#   - "@username"
+
+# --- Tag / phrase filtering --------------------------------------------------
+# Phrases or words filtered OUT of "Common phrases", "Top words" and word clouds.
+# These defaults strip Instagram call/system boilerplate that otherwise biases the
+# phrase charts. Case-insensitive substring match. Add your own as needed.
+exclude_phrases:
+  - "audio call"
+  - "video call"
+  - "call ended"
+  - "started call"
+  - "started audio"
+  - "started chat"
+  - "update app"
+  - "app view"
+  - "view update"
+
+# --- Privacy -----------------------------------------------------------------
+# The Message Explorer embeds a sample of your real message text in the HTML.
+# Set to false if you intend to share the generated dashboard publicly.
+include_examples: true
+
+# --- Date window (YYYY-MM-DD, or null for no bound) ---------------------------
+date_from: null
+date_to: null
+
+# --- Display / model knobs ----------------------------------------------------
+min_chat_messages: 1        # min messages for a chat to appear in per-chat charts
+topics_k: 12                # number of NMF latent topics
+top_chats: 60               # how many chats to keep in the ledger / data
+sentiment_model: "cardiffnlp/twitter-xlm-roberta-base-sentiment"

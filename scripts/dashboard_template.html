@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instagram · A Data Portrait</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..600&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>/*__PLOTLY__*/</script>
+<script>const DATA = /*__DATA__*/;</script>
+<style>
+:root{
+  --bg:#f3f0e9; --surface:#faf8f3; --surface2:#ece8df; --border:#d8d2c5; --border2:#c4bdae;
+  --text:#1c1a17; --muted:#5c574e; --dim:#8a847a;
+  --accent:#8a2a2a; --accent2:#2f4858; --pos:#3f6b4a; --neg:#9a3324; --neu:#6f6a60;
+  --maxw:1180px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-weight:400; line-height:1.6; letter-spacing:0; -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+.mono{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+h1,h2,h3,h4{font-family:"Newsreader","Iowan Old Style",Georgia,serif}
+
+/* ---------- nav ---------- */
+nav{position:sticky;top:0;z-index:50;background:var(--surface);border-bottom:1px solid var(--border)}
+.nav-in{max-width:var(--maxw);margin:0 auto;padding:13px 40px;display:flex;align-items:center;gap:24px}
+.brand{font-family:"Newsreader",serif;font-weight:600;font-size:17px;display:flex;align-items:center;gap:9px;color:var(--text)}
+.brand .dot{width:9px;height:9px;border-radius:50%;background:var(--accent)}
+.nav-links{display:flex;gap:2px;margin-left:auto;flex-wrap:wrap}
+.nav-links a{font-size:12.5px;color:var(--muted);padding:6px 11px;border-radius:3px;transition:color .2s,background .2s}
+.nav-links a:hover{color:var(--text);background:var(--surface2)}
+.progress{position:fixed;top:0;left:0;height:2px;width:0;background:var(--accent);z-index:60;transition:width .1s}
+@media(max-width:880px){.nav-links{display:none} .nav-in{padding:13px 22px}}
+
+/* ---------- layout ---------- */
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 40px}
+@media(max-width:880px){.wrap{padding:0 22px}}
+section{padding:96px 0 18px;scroll-margin-top:64px}
+.sec-head{margin-bottom:40px;max-width:720px}
+.kicker{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--dim);display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.kicker .num{color:var(--accent);font-weight:600}
+.kicker::before{content:"";width:28px;height:1px;background:var(--border)}
+h2{font-weight:360;font-size:clamp(26px,3.4vw,40px);line-height:1.06;margin:0 0 16px;letter-spacing:-.015em;color:var(--text)}
+h2 em{font-style:italic;font-weight:500;color:var(--accent)}
+.dek{color:var(--muted);font-size:16px;max-width:62ch}
+.dek b{color:var(--text);font-weight:600}
+
+/* grid + cards */
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:20px}
+.card{grid-column:span 12;background:var(--surface);border:1px solid var(--border);border-radius:3px;
+  padding:22px 22px 16px;position:relative;overflow:hidden;box-shadow:none}
+.card:hover{border-color:var(--border2)}
+.col-6{grid-column:span 6}.col-5{grid-column:span 5}.col-7{grid-column:span 7}
+.col-4{grid-column:span 4}.col-8{grid-column:span 8}.col-3{grid-column:span 3}
+@media(max-width:980px){.col-6,.col-5,.col-7,.col-4,.col-8,.col-3{grid-column:span 12}}
+.card h3{font-weight:500;font-size:18px;margin:0 0 3px;letter-spacing:-.01em;color:var(--text)}
+.card .sub{color:var(--dim);font-size:11.5px;margin-bottom:14px;font-family:"IBM Plex Mono",monospace;letter-spacing:.02em}
+.chart{width:100%;height:330px}
+.chart.tall{height:420px}.chart.sm{height:260px}
+
+/* ---------- hero ---------- */
+.hero{padding:72px 0 56px;border-bottom:1px solid var(--border)}
+.hero .eyebrow{font-family:"IBM Plex Mono",monospace;font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--dim);margin-bottom:24px}
+.hero h1{font-weight:380;font-size:clamp(40px,6vw,72px);line-height:1.05;letter-spacing:-.02em;margin:0 0 24px;max-width:16ch;color:var(--text)}
+.hero h1 em{font-style:italic;font-weight:500;color:var(--accent);font-family:"Newsreader",serif}
+.hero h1 .num{font-family:"IBM Plex Mono",monospace;color:var(--accent);font-style:normal;letter-spacing:-.02em}
+.hero .lede{font-family:"Newsreader",serif;font-size:clamp(17px,2vw,21px);line-height:1.5;color:var(--muted);max-width:60ch;margin-bottom:40px}
+.hero .lede b{color:var(--text);font-weight:600}
+.hero-stats{display:flex;gap:40px;flex-wrap:wrap}
+.hs{display:flex;flex-direction:column;gap:5px}
+.hs .v{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;font-weight:600;font-size:clamp(24px,3.4vw,36px);line-height:1;color:var(--text);letter-spacing:-.01em}
+.hs .l{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+
+/* ---------- KPI cards ---------- */
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:14px}
+@media(max-width:980px){.kpis{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:560px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--surface);border:1px solid var(--border);border-left:2px solid var(--accent);border-radius:3px;padding:18px}
+.kpi .v{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;font-weight:600;font-size:26px;color:var(--text)}
+.kpi .l{font-size:11.5px;color:var(--muted);margin-top:5px;line-height:1.35}
+.kpi .x{font-size:11px;color:var(--dim);margin-top:6px;font-family:"IBM Plex Mono",monospace}
+
+/* tables */
+.tbl-wrap{overflow-x:auto;margin:-4px -6px 0}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:right;padding:8px 11px;white-space:nowrap}
+td{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;color:var(--text);border-bottom:1px solid var(--surface2)}
+th{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);font-weight:500;cursor:pointer;user-select:none;border-bottom:1px solid var(--border)}
+th:hover{color:var(--text)}
+td:first-child,th:first-child{text-align:left;position:sticky;left:0;background:var(--surface);font-family:"Archivo",sans-serif}
+tbody tr:hover{background:var(--surface2)}
+.bar-cell{position:relative}
+.bar-cell .b{position:absolute;left:0;top:50%;transform:translateY(-50%);height:58%;border-radius:2px;background:rgba(138,42,42,.16);z-index:0}
+.bar-cell span{position:relative;z-index:1}
+.tag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:3px;font-family:"IBM Plex Mono",monospace;letter-spacing:.04em;background:var(--surface2);color:var(--muted)}
+
+/* chips / lists */
+.chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:4px}
+.chip{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:9px 13px;display:flex;align-items:baseline;gap:9px}
+.chip .e{font-size:20px}.chip .n{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:14px;color:var(--text)}
+.topic{background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:15px 16px}
+.topic .th{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:9px;display:flex;justify-content:space-between}
+.topic .tw{display:flex;flex-wrap:wrap;gap:7px}
+.topic .tw span{font-size:13.5px;padding:3px 9px;border-radius:3px;background:var(--surface2);color:var(--text)}
+.topic .tw span:first-child{background:var(--accent);color:var(--bg);font-weight:600}
+.wc-img{width:100%;border-radius:3px;display:block;background:var(--surface);border:1px solid var(--border)}
+
+.callout{background:var(--surface2);border:1px solid var(--border);border-left:2px solid var(--accent);border-radius:3px;
+  padding:16px 20px;margin:24px 0 0;font-family:"Newsreader",serif;font-size:15px;line-height:1.55;color:var(--muted)}
+.callout b{color:var(--text);font-weight:600}
+.lead-row{display:flex;gap:40px;flex-wrap:wrap;margin-bottom:32px}
+.lead-row .li{flex:1;min-width:180px}
+.lead-row .li .v{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;font-weight:600;font-size:28px;color:var(--text)}
+.lead-row .li .l{font-size:13px;color:var(--muted);margin-top:4px;line-height:1.4}
+
+footer{border-top:1px solid var(--border);margin-top:80px;padding:46px 0 80px}
+footer .meth{color:var(--muted);font-size:13.5px;line-height:1.85;max-width:820px}
+footer .meth b{color:var(--text)}
+footer .meth code{font-family:"IBM Plex Mono",monospace;font-size:12.5px;background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;color:var(--text)}
+footer h4{font-weight:500;font-size:18px;margin:0 0 14px;color:var(--text)}
+
+/* message explorer */
+.ex-controls{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.ex-lbl{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+#ex-select{font-family:"Archivo",sans-serif;font-size:13px;color:var(--text);background:var(--surface2);
+  border:1px solid var(--border);border-radius:3px;padding:7px 12px;min-width:260px;cursor:pointer}
+#ex-select:hover{border-color:var(--border2)}
+.ex-list{max-height:460px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:2px 6px 2px 2px}
+.msg{max-width:78%;padding:9px 13px;border-radius:13px;font-size:14px;line-height:1.45;word-wrap:break-word}
+.msg .m-meta{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--dim);margin-bottom:3px;display:flex;gap:8px;align-items:center}
+.msg.me{align-self:flex-end;background:var(--accent);color:#faf8f3;border-bottom-right-radius:3px}
+.msg.me .m-meta{color:rgba(250,248,243,.72)}
+.msg.them{align-self:flex-start;background:var(--surface2);color:var(--text);border:1px solid var(--border2);border-bottom-left-radius:3px}
+.msg .dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation:none!important;transition:none!important}
+  .card,.kpi{opacity:1!important}
+}
+</style>
+</head>
+<body>
+<div class="progress" id="prog"></div>
+<nav>
+  <div class="nav-in">
+    <div class="brand"><span class="dot"></span> Instagram · A Data Portrait</div>
+    <div class="nav-links">
+      <a href="#overview">Overview</a>
+      <a href="#timeline">Timeline</a>
+      <a href="#rhythm">Rhythms</a>
+      <a href="#people">People</a>
+      <a href="#dynamics">Dynamics</a>
+      <a href="#sentiment">Sentiment</a>
+      <a href="#language">Language</a>
+      <a href="#brainrot">Brainrot</a>
+      <a href="#emoji">Emoji</a>
+      <a href="#clusters">Clusters</a>
+      <a href="#activity">Activity</a>
+      <a href="#interests">Interests</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+  <!-- HERO -->
+  <header class="hero">
+    <div class="eyebrow">Personal data export · <span id="h-range"></span></div>
+    <h1>The anatomy of <span class="num" id="h-total">—</span> messages.</h1>
+    <p class="lede">An eight-year archive of <b id="h-name">—</b>'s Instagram life — every message, reaction, emoji and late-night reply — read by a multilingual sentiment model and mapped across <b id="h-threads">—</b> conversations. Scroll to explore the patterns hidden in <b id="h-years">—</b> years of chatting.</p>
+    <div class="hero-stats">
+      <div class="hs"><div class="v" id="h-sent">—</div><div class="l">Sent by you</div></div>
+      <div class="hs"><div class="v" id="h-recv">—</div><div class="l">Received</div></div>
+      <div class="hs"><div class="v" id="h-react">—</div><div class="l">Reactions</div></div>
+      <div class="hs"><div class="v" id="h-days">—</div><div class="l">Active days</div></div>
+      <div class="hs"><div class="v" id="h-peak">—</div><div class="l">Busiest day</div></div>
+    </div>
+  </header>
+
+  <!-- OVERVIEW -->
+  <section id="overview">
+    <div class="sec-head">
+      <div class="kicker"><span class="num">01</span> Overview</div>
+      <h2>A <em>half-million</em> message lifetime.</h2>
+      <p class="dek">The headline numbers across the whole inbox — direct messages and group chats combined, in <b>Europe/Bratislava</b> local time.</p>
+    </div>
+    <div class="kpis" id="kpis"></div>
+    <div class="callout" id="overview-callout"></div>
+  </section>
+
+  <!-- TIMELINE -->
+  <section id="timeline">
+    <div class="sec-head">
+      <div class="kicker"><span class="num">02</span> The Timeline</div>
+      <h2>Messages, <em>month by month</em>.</h2>
+      <p class="dek">How the volume of conversation grew, peaked and ebbed over the years. The split shows what you <b>sent</b> versus what you <b>received</b>.</p>
+    </div>
+    <div class="grid">
+      <div class="card col-8"><h3>Messages per month</h3><div class="sub">stacked · sent vs received · drag to zoom</div><div class="chart tall" data-chart="monthly"></div></div>
+      <div class="card col-4"><h3>By year</h3><div class="sub">annual totals</div><div class="chart tall" data-chart="year"></div></div>
+      <div class="card col-12"><h3>Daily volume</h3><div class="sub">every active day · use the range slider</div><div class="chart" data-chart="daily"></div></div>
+    </div>
+  </section>
+
+  <!-- RHYTHM -->
+  <section id="rhythm">
+    <div class="sec-head">
+      <div class="kicker"><span class="num">03</span> Rhythms</div>
+      <h2>When the <em>talking</em> happens.</h2>
+      <p class="dek">Conversation has a heartbeat — hour of day, day of week, season of year. The heatmap is the fingerprint: lighter cells are quieter, darker cells are peak chatter.</p>
+    </div>
+    <div class="grid">
+      <div class="card col-7"><h3>Hour of day</h3><div class="sub">when are you most active</div><div class="chart" data-chart="hour"></div></div>
+      <div class="card col-5"><h3>Day of week</h3><div class="sub">sent vs received</div><div class="chart" data-chart="weekday"></div></div>
+      <div class="card col-12"><h3>The weekly fingerprint</h3><div class="sub">weekday × hour · message density</div><div class="chart" data-chart="heatwh"></div></div>
+      <div class="card col-7"><h3>Seasonality</h3><div class="sub">year × month density</div><div class="chart" data-chart="heatym"></div></div>
+      <div class="card col-5"><h3>Month of year</h3><div class="sub">all years combined</div><div class="chart" data-chart="moy"></div></div>
+      <div class="card col-12"><h3>The week in three dimensions</h3><div class="sub">weekday × hour × volume · 3D surface · drag to rotate</div><div class="chart tall" data-chart="surface3d"></div></div>
+    </div>
+  </section>
+
+  <!-- PEOPLE -->
+  <section id="people">
+    <div class="sec-head">
+      <div class="kicker"><span class="num">04</span> The People</div>
+      <h2>Who you <em>actually</em> talk to.</h2>
+      <p class="dek">243 conversations, but attention is never evenly spread. A handful of people account for the overwhelming majority of everything said.</p>
+    </div>
+    <div class="lead-row" id="people-lead"></div>
+    <div class="grid">
+      <div class="card col-7"><h3>Top conversations by volume</h3><div class="sub">total messages · top 15</div><div class="chart tall" data-chart="topchats"></div></div>
+      <div class="card col-5"><h3>Where messages live</h3><div class="sub">DMs vs group chats</div><div class="chart tall" data-chart="dmgroup"></div></div>
+      <div class="card col-12">
+        <h3>Conversation ledger</h3><div class="sub">top 30 chats · click a header to sort</div>
+        <div class="tbl-wrap"><table id="chat-table"></table></div>
+      </div>
+      <div class="card col-12"><h3>The conversation galaxy</h3><div class="sub">3D · volume × sentiment × your share of the talking · drag to rotate</div><div class="chart tall" data-chart="galaxy"></div></div>
+      <div class="card col-12">
+        <h3>Message explorer</h3><div class="sub">a sample of real messages · filter by conversation</div>
+        <div class="ex-controls"><label class="ex-lbl">Conversation</label><select id="ex-select"></select></div>
+        <div id="ex-list" class="ex-list"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DYNAMICS -->
+  <section id="dynamics">
+    <div class="sec-head">
+      <div class="kicker"><span class="num">05</span> Conversation Dynamics</div>
+      <h2>The <em>physics</em> of a reply.</h2>
+      <p class="dek">How fast you answer, who breaks the silence first, and how long your messages run. Reply speed is measured within DMs, counting turn-taking gaps under six hours.</p>
+    </div>
+    <div class="grid">
+      <div class="card col-6"><h3>Reply time</h3><div class="sub">how quickly each side responds</div><div class="chart" data-chart="resp"></div></div>
+      <div class="card col-3"><h3>Who texts first</h3><div class="sub">conversation openers</div><div class="chart" data-chart="init"></div></div>
+      <div class="card col-3"><h3>Message length</h3><div class="sub">words per message</div><div class="chart" data-chart="len"></div></div>
+      <div class="card col-12"><h3>What you send</h3><div class="sub">composition of the outbox</div><div class="chart sm" data-chart="composition"></div></div>
+    </div>
+  </section>
+
+  <!-- SENTIMENT -->
+  <section id="sentiment">
+    <div class="sec-head">
+      <div class="kicker"><span class="num">06</span> Sentiment</div>
+      <h2>The <em>emotional</em> weather.</h2>
+      <p class="dek">Every human-written message scored by <b>XLM-RoBERTa</b> (multilingual, social-media tuned) into positive / neutral / negative. The <b>compound</b> score runs −1 to +1; treat it comparatively — between chats and across time — rather than as an absolute verdict.</p>
+    </div>
+    <div class="grid">
+      <div class="card col-4"><h3>Overall mix</h3><div class="sub">all human messages</div><div class="chart" data-chart="sentdist"></div></div>
+      <div class="card col-8"><h3>Sentiment over time</h3><div class="sub">monthly mean compound · band = pos/neg share</div><div class="chart" data-chart="sentmonth"></div></div>
+      <div class="card col-7"><h3>Per-chat emotional map</h3><div class="sub">volume × sentiment · bubble = messages</div><div class="chart tall" data-chart="sentscatter"></div></div>
+      <div class="card col-5"><h3>By hour &amp; weekday</h3><div class="sub">mean compound score</div><div class="chart tall" data-chart="senttime"></div></div>
+      <div class="card col-6"><h3>Brightest conversations</h3><div class="sub">highest mean sentiment · ≥300 msgs</div><div class="chart" data-chart="sentpos"></div></div>
+      <div class="card col-6"><h3>Heaviest conversations</h3><div class="sub">lowest mean sentiment · ≥300 msgs</div><div class="chart" data-chart="sentneg"></div></div>
+    </div>
+  </section>
+
+  <!-- LANGUAGE -->
+  <section id="language">
+    <div class="sec-head">
+      <div class="kicker"><span class="num">07</span> Language &amp; Topics</div>
+      <h2>The <em>words</em> you live in.</h2>
+      <p class="dek">Slovak, mostly — terse, fast, affectionate. Words are <b>lemmatized</b> (so <i>idem/ideš/ideme</i> collapse to <i>ísť</i>), stopwords and Instagram's auto-messages stripped; topics surface via <b>NMF</b> matrix factorization.</p>
+    </div>
+    <div class="grid">
+      <div class="card col-7"><h3>Word cloud</h3><div class="sub">most frequent meaningful lemmas</div><img class="wc-img" id="wc-all" alt="word cloud"></div>
+      <div class="card col-5"><h3>Top words</h3><div class="sub">frequency</div><div class="chart tall" data-chart="words"></div></div>
+      <div class="card col-6"><h3>Common phrases</h3><div class="sub">top bigrams</div><div class="chart" data-chart="bigrams"></div></div>
+      <div class="card col-6"><h3>Your vocabulary</h3><div class="sub">your own outgoing words</div><img class="wc-img" id="wc-self" alt="word cloud (you)"></div>
+      <div class="card col-12"><h3>Latent topics</h3><div class="sub" id="topic-sub">NMF · 12 components</div><div class="grid" id="topics" style="gap:12px"></div></div>
+    </div>
+  </section>
+
+  <!-- BRAINROT / SLANG -->
+  <section id="brainrot">
+    <div class="sec-head">
+      <div class="kicker"><span class="num">08</span> The Brainrot Index</div>
+      <h2>Slang, <em>brainrot</em> &amp; swearing.</h2>
+      <p class="dek">A hand-built lexicon — Gen-Z <b>brainrot</b> (rizz, sigma, sus, cooked…), chat acronyms (xd, gg, ngl…), Slovak street slang (kámo, čavo, typek…) and the inevitable vulgarities — matched across every human message, accent-insensitive. The trend line is the real story.</p>
+    </div>
+    <div class="lead-row" id="slang-lead"></div>
+    <div class="grid">
+      <div class="card col-8"><h3>The brainrot trend</h3><div class="sub">slang words per 1,000 messages · monthly</div><div class="chart" data-chart="slangtrend"></div></div>
+      <div class="card col-4"><h3>By flavour</h3><div class="sub">share of slang hits</div><div class="chart" data-chart="slangcat"></div></div>
+      <div class="card col-12"><h3>Top slang terms</h3><div class="sub">you vs everyone else</div><div class="chart tall" data-chart="slangterms"></div></div>
+    </div>
+  </section>
+
+  <!-- EMOJI -->
+  <section id="emoji">
+    <div class="sec-head">
+      <div class="kicker"><span class="num">09</span> Emoji &amp; Reactions</div>
+      <h2>Speaking in <em>symbols</em>.</h2>
+      <p class="dek">When words run out, emoji and reactions carry the tone. Here's the visual vocabulary — and who keeps the reactions flowing.</p>
+    </div>
+    <div class="grid">
+      <div class="card col-7"><h3>Most-used emoji</h3><div class="sub">you vs everyone else</div><div class="chart" data-chart="emoji"></div></div>
+      <div class="card col-5"><h3>Reaction palette</h3><div class="sub">tap-back reactions</div><div class="chart" data-chart="react"></div></div>
+      <div class="card col-6"><h3>Who reacts to you</h3><div class="sub">reactions received</div><div class="chart sm" data-chart="reactto"></div></div>
+      <div class="card col-6"><h3>Who you react to</h3><div class="sub">reactions given</div><div class="chart sm" data-chart="reactby"></div></div>
+    </div>
+  </section>
+
+  <!-- CLUSTERS -->
+  <section id="clusters">
+    <div class="sec-head">
+      <div class="kicker"><span class="num">10</span> Behavioural Clusters</div>
+      <h2>The <em>shapes</em> of a relationship.</h2>
+      <p class="dek">Each conversation reduced to its behavioural signature — your share of the talking, message length, intensity, reply speed, tone — then grouped by <b>K-means</b> and projected to 2D with PCA. Conversations near each other simply <i>feel</i> alike.</p>
+    </div>
+    <div class="grid">
+      <div class="card col-12"><h3>Conversation clusters</h3><div class="sub" id="cluster-sub">K-means · PCA projection</div><div class="chart tall" data-chart="clusters"></div></div>
+    </div>
+  </section>
+
+  <!-- ACTIVITY -->
+  <section id="activity">
+    <div class="sec-head">
+      <div class="kicker"><span class="num">11</span> Beyond Messages</div>
+      <h2>The <em>quieter</em> footprint.</h2>
+      <p class="dek">Messaging is only part of the story. Likes, stories watched, polls and comments leave their own trail across the years.</p>
+    </div>
+    <div class="lead-row" id="act-lead"></div>
+    <div class="grid">
+      <div class="card col-8"><h3>Activity over time</h3><div class="sub">monthly events by type</div><div class="chart" data-chart="actmonth"></div></div>
+      <div class="card col-4"><h3>By hour</h3><div class="sub">when you browse</div><div class="chart" data-chart="acthour"></div></div>
+    </div>
+    <div class="callout"><b>Why "posts liked" ≫ "posts viewed":</b> Instagram's export logs <b>every like you've ever made</b> (a complete history), but only includes a small <b>recent window</b> of "posts &amp; videos viewed" — not your true view count. So liked (complete) far exceeds viewed (partial snapshot); you obviously viewed far more than the export reveals.</div>
+  </section>
+
+  <!-- INTERESTS -->
+  <section id="interests">
+    <div class="sec-head">
+      <div class="kicker"><span class="num">12</span> Interests &amp; Discovery</div>
+      <h2>What the <em>algorithm</em> feeds you.</h2>
+      <p class="dek">Mined from the captions of <b>every post &amp; reel you liked or watched</b> — the hashtags and creators behind your engagement. This is the closest thing to your interest graph: football, memes, and a lot of Slovak content.</p>
+    </div>
+    <div class="lead-row" id="int-lead"></div>
+    <div class="grid">
+      <div class="card col-7"><h3>Top hashtags</h3><div class="sub">tags on content you engaged with</div><div class="chart tall" data-chart="hashtags"></div></div>
+      <div class="card col-5"><h3>Reels vs posts</h3><div class="sub">of liked/watched content</div><div class="chart tall" data-chart="reelsposts"></div></div>
+      <div class="card col-7"><h3>Top creators</h3><div class="sub">accounts behind the content you like</div><div class="chart tall" data-chart="creators"></div></div>
+      <div class="card col-5"><h3>Reel hashtags</h3><div class="sub">tags specific to reels</div><div class="chart tall" data-chart="reeltags"></div></div>
+      <div class="card col-12"><h3>Engagement over time</h3><div class="sub">likes &amp; views logged per month</div><div class="chart" data-chart="intmonth"></div></div>
+    </div>
+  </section>
+
+  <footer>
+    <h4>Methodology &amp; notes</h4>
+    <div class="meth" id="methodology"></div>
+  </footer>
+</div>
+
+<script>
+/* ============================ helpers ============================ */
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+const C={accent:'#8a2a2a',accent2:'#2f4858',seq:['#8a2a2a','#2f4858','#9c8348','#5e7a6a','#6f6a60','#b07a4a'],
+  pos:'#3f6b4a',neu:'#6f6a60',neg:'#9a3324',mut:'#5c574e',dim:'#8a847a',grid:'rgba(28,26,23,.07)',
+  text:'#1c1a17',bg:'#f3f0e9',surface:'#faf8f3'};
+const INK=[[0,'#f3f0e9'],[0.5,'#b8a08c'],[1,'#1c1a17']];
+const DIVERGE=[[0,'#9a3324'],[0.5,'#d8d2c5'],[1,'#3f6b4a']];
+const FONT='"Archivo",system-ui,sans-serif', MONO='"IBM Plex Mono",ui-monospace,monospace';
+const fmt=n=>n==null?'—':n.toLocaleString('en-US');
+const fmtK=n=>{n=+n;if(n>=1e6)return (n/1e6).toFixed(n>=1e7?0:1)+'M';if(n>=1e3)return (n/1e3).toFixed(n>=1e4?0:1)+'k';return ''+n;};
+const pct=x=>(x*100).toFixed(1)+'%';
+function dur(s){if(s==null)return '—';if(s<60)return s+'s';if(s<3600)return (s/60).toFixed(s<600?1:0)+'m';return (s/3600).toFixed(1)+'h';}
+function niceDate(s){const d=new Date(s);return d.toLocaleDateString('en-US',{day:'numeric',month:'short',year:'numeric'});}
+/* single-hue oxblood opacity ramp (replaces neon gradient) */
+function shade(vals){const m=Math.max(...vals)||1;return vals.map(v=>`rgba(138,42,42,${(.3+.6*Math.max(0,v)/m).toFixed(3)})`);}
+
+const baseLayout=(o={})=>Object.assign({
+  paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',
+  font:{family:FONT,color:C.mut,size:12},
+  margin:{l:54,r:18,t:10,b:42},
+  hoverlabel:{bgcolor:'#1c1a17',bordercolor:'#1c1a17',font:{family:MONO,color:'#faf8f3',size:12}},
+  xaxis:Object.assign({gridcolor:C.grid,zerolinecolor:'rgba(28,26,23,.18)',linecolor:'#d8d2c5',tickfont:{family:MONO,size:11},automargin:true},o.xaxis||{}),
+  yaxis:Object.assign({gridcolor:C.grid,zerolinecolor:'rgba(28,26,23,.18)',linecolor:'#d8d2c5',tickfont:{family:MONO,size:11},automargin:true},o.yaxis||{}),
+  legend:Object.assign({orientation:'h',y:1.12,x:0,font:{family:FONT,size:11.5},bgcolor:'rgba(0,0,0,0)'},o.legend||{}),
+  barcornerradius:2,
+},(()=>{const c=Object.assign({},o);delete c.xaxis;delete c.yaxis;delete c.legend;return c;})());
+const CFG={displayModeBar:false,responsive:true};
+/* 3D scene styling for the light/paper theme */
+const axis3d=(t)=>({title:{text:t,font:{family:MONO,size:11,color:C.dim}},
+  backgroundcolor:'rgba(0,0,0,0)',showbackground:true,gridcolor:'rgba(28,26,23,.10)',
+  zerolinecolor:'rgba(28,26,23,.2)',color:C.mut,tickfont:{family:MONO,size:9}});
+function layout3d(sc,o={}){return Object.assign({paper_bgcolor:'rgba(0,0,0,0)',
+  font:{family:FONT,color:C.mut,size:11},margin:{l:0,r:0,t:0,b:0},
+  scene:Object.assign({xaxis:axis3d(sc.x),yaxis:axis3d(sc.y),zaxis:axis3d(sc.z),
+    bgcolor:'rgba(0,0,0,0)',camera:{eye:{x:1.6,y:1.5,z:1.2}}},sc.extra||{}),
+  legend:{orientation:'h',y:1.02,x:0,font:{size:11}}},o);}
+
+/* lazy chart registry */
+const R={};
+function lazy(){const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){
+  const id=e.target.dataset.chart; if(R[id]&&!e.target._done){e.target._done=1;requestAnimationFrame(()=>R[id](e.target));}
+}});},{rootMargin:'120px'});
+  $$('[data-chart]').forEach(el=>io.observe(el));}
+function reveals(){const io=new IntersectionObserver((es)=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{rootMargin:'-30px'});
+  $$('.card,.kpi').forEach(el=>io.observe(el));}
+
+/* ============================ HERO + KPIs ============================ */
+function hero(){
+  const k=DATA.kpis,m=DATA.meta;
+  $('#h-range').textContent=niceDate(m.date_min)+' – '+niceDate(m.date_max);
+  $('#h-name').textContent=m.self_name;
+  $('#h-threads').textContent=fmt(m.n_threads_inbox);
+  $('#h-years').textContent=Math.round((new Date(m.date_max)-new Date(m.date_min))/3.156e10);
+  $('#h-total').textContent=fmt(k.total_messages);
+  $('#h-sent').textContent=fmt(k.messages_sent);
+  $('#h-recv').textContent=fmt(k.messages_received);
+  $('#h-react').textContent=fmt(k.reactions_total);
+  $('#h-days').textContent=fmt(k.days_active);
+  $('#h-peak').textContent=fmt(k.busiest_day_count);
+}
+function kpis(){
+  const k=DATA.kpis;
+  const items=[
+    ['total_messages','Total messages','across '+fmt(k.n_conversations)+' chats'],
+    ['messages_sent','Sent','·'+pct(k.sent_share)+' of all'],
+    ['messages_received','Received','·'+pct(1-k.sent_share)],
+    ['human_text_messages','Human text msgs',fmt(k.system_messages)+' auto-msgs removed'],
+    ['reactions_total','Reactions','given '+fmt(k.reactions_given)+' · got '+fmt(k.reactions_received)],
+    ['shares','Posts/reels shared','the share habit'],
+    ['avg_msgs_per_active_day','Msgs / active day','on days you chatted'],
+    ['longest_streak_days','Day streak','consecutive active days'],
+    ['n_dm_chats','Direct chats',fmt(k.n_group_chats)+' group chats'],
+    ['calls','Calls','voice & video'],
+    ['total_words_sent','Words written','by you'],
+    ['followers','Followers','following '+fmt(k.following)],
+  ];
+  const wrap=$('#kpis');
+  items.forEach(([key,label,extra])=>{
+    const d=document.createElement('div');d.className='kpi';
+    d.innerHTML=`<div class="v">${fmt(k[key]||0)}</div><div class="l">${label}</div><div class="x">${extra}</div>`;
+    wrap.appendChild(d);
+  });
+  $('#overview-callout').innerHTML=`On <b>${niceDate(k.busiest_day)}</b> you exchanged <b>${fmt(k.busiest_day_count)}</b> messages — the single most talkative day in the archive. Across ${fmt(k.span_days)} days you were active on <b>${pct(k.active_day_ratio)}</b> of them, averaging <b>${k.avg_msgs_per_active_day}</b> messages per active day. You send roughly <b>1 message for every 2 you receive</b>.`;
+}
+
+/* ============================ TIMELINE ============================ */
+R.monthly=el=>{const t=DATA.temporal.by_month;Plotly.newPlot(el,[
+  {x:t.ym,y:t.received,name:'Received',type:'bar',marker:{color:C.accent2},hovertemplate:'%{x}<br>received %{y:,}<extra></extra>'},
+  {x:t.ym,y:t.sent,name:'Sent',type:'bar',marker:{color:C.accent},hovertemplate:'%{x}<br>sent %{y:,}<extra></extra>'},
+],baseLayout({barmode:'stack',xaxis:{type:'category',rangeslider:{visible:true,thickness:.07,bgcolor:'rgba(28,26,23,.04)'},nticks:14}}),CFG);};
+
+R.year=el=>{const t=DATA.temporal.by_year;Plotly.newPlot(el,[
+  {x:t.years,y:t.sent,name:'Sent',type:'bar',marker:{color:C.accent}},
+  {x:t.years,y:t.received,name:'Received',type:'bar',marker:{color:C.accent2}},
+],baseLayout({barmode:'stack',xaxis:{type:'category'}}),CFG);};
+
+R.daily=el=>{const t=DATA.temporal.daily;Plotly.newPlot(el,[
+  {x:t.dates,y:t.counts,type:'scatter',mode:'lines',fill:'tozeroy',line:{color:C.accent,width:1},
+   fillcolor:'rgba(138,42,42,.10)',hovertemplate:'%{x}<br>%{y:,} msgs<extra></extra>'},
+],baseLayout({margin:{l:50,r:18,t:10,b:30},xaxis:{rangeslider:{visible:true,thickness:.09,bgcolor:'rgba(28,26,23,.04)'}}}),CFG);};
+
+/* ============================ RHYTHM ============================ */
+R.hour=el=>{const t=DATA.temporal.by_hour;Plotly.newPlot(el,[
+  {x:t.hours,y:t.received,name:'Received',type:'bar',marker:{color:C.accent2}},
+  {x:t.hours,y:t.sent,name:'Sent',type:'bar',marker:{color:C.accent}},
+],baseLayout({barmode:'stack',xaxis:{title:'hour of day',dtick:2}}),CFG);};
+
+R.weekday=el=>{const t=DATA.temporal.by_weekday;Plotly.newPlot(el,[
+  {y:t.labels,x:t.received,name:'Received',type:'bar',orientation:'h',marker:{color:C.accent2}},
+  {y:t.labels,x:t.sent,name:'Sent',type:'bar',orientation:'h',marker:{color:C.accent}},
+],baseLayout({barmode:'stack',yaxis:{autorange:'reversed'}}),CFG);};
+
+R.heatwh=el=>{const t=DATA.temporal.heatmap_weekday_hour;Plotly.newPlot(el,[
+  {z:t.z,x:t.hours,y:t.weekdays,type:'heatmap',colorscale:INK,xgap:1,ygap:1,
+   hovertemplate:'%{y} · %{x}:00<br>%{z:,} msgs<extra></extra>',colorbar:{thickness:10,len:.85,outlinewidth:0,tickfont:{family:MONO,size:10}}},
+],baseLayout({height:300,margin:{l:54,r:10,t:10,b:40},xaxis:{title:'hour',dtick:2,gridcolor:'rgba(0,0,0,0)'},yaxis:{autorange:'reversed',gridcolor:'rgba(0,0,0,0)'}}),CFG);};
+
+R.heatym=el=>{const t=DATA.temporal.heatmap_year_month;Plotly.newPlot(el,[
+  {z:t.z,x:t.months,y:t.years,type:'heatmap',colorscale:INK,xgap:1,ygap:1,
+   hovertemplate:'%{y} %{x}<br>%{z:,} msgs<extra></extra>',colorbar:{thickness:10,len:.85,outlinewidth:0,tickfont:{family:MONO,size:10}}},
+],baseLayout({margin:{l:48,r:10,t:10,b:36},xaxis:{gridcolor:'rgba(0,0,0,0)'},yaxis:{type:'category',gridcolor:'rgba(0,0,0,0)'}}),CFG);};
+
+R.moy=el=>{const t=DATA.temporal.by_month_of_year;Plotly.newPlot(el,[
+  {x:t.labels,y:t.counts,type:'bar',marker:{color:shade(t.counts)},hovertemplate:'%{x}<br>%{y:,}<extra></extra>'},
+],baseLayout({}),CFG);};
+
+/* ============================ PEOPLE ============================ */
+function peopleLead(){const c=DATA.chats[0],k=DATA.kpis;
+  const top3=DATA.chats.slice(0,3).reduce((a,b)=>a+b.n,0);
+  $('#people-lead').innerHTML=`
+   <div class="li"><div class="v">${c.title}</div><div class="l">Your #1 conversation — ${fmt(c.n)} messages (${pct(c.n/k.total_messages)} of everything)</div></div>
+   <div class="li"><div class="v">${pct(top3/k.total_messages)}</div><div class="l">of all messages are with your top 3 people</div></div>
+   <div class="li"><div class="v">${fmt(k.n_dm_chats)} + ${fmt(k.n_group_chats)}</div><div class="l">direct chats &amp; group chats</div></div>`;}
+
+R.topchats=el=>{const c=DATA.chats.slice(0,15).reverse();const lab=c.map(x=>x.title.length>22?x.title.slice(0,21)+'…':x.title);Plotly.newPlot(el,[
+  {y:lab,x:c.map(x=>x.received),name:'Received',type:'bar',orientation:'h',marker:{color:C.accent2}},
+  {y:lab,x:c.map(x=>x.sent),name:'Sent',type:'bar',orientation:'h',marker:{color:C.accent}},
+],baseLayout({barmode:'stack',margin:{l:150,r:14,t:30,b:30},yaxis:{tickfont:{family:FONT,size:11}}}),CFG);};
+
+R.dmgroup=el=>{const k=DATA.kpis;
+  const dm=DATA.chats.filter(c=>!c.is_group).reduce((a,b)=>a+b.n,0);
+  const gr=DATA.chats.filter(c=>c.is_group).reduce((a,b)=>a+b.n,0);
+  Plotly.newPlot(el,[{values:[dm,gr],labels:['Direct messages','Group chats'],type:'pie',hole:.62,
+   marker:{colors:[C.accent,C.accent2],line:{color:C.bg,width:2}},textinfo:'label+percent',
+   textfont:{family:FONT,size:12,color:'#faf8f3'},hovertemplate:'%{label}<br>%{value:,} msgs<extra></extra>'}],
+   baseLayout({showlegend:false,margin:{l:10,r:10,t:20,b:10},
+    annotations:[{text:fmt(k.n_dm_chats+k.n_group_chats)+'<br>chats',showarrow:false,font:{family:MONO,size:15,color:C.text}}]}),CFG);};
+
+function chatTable(){
+  const cols=[['title','Conversation'],['n','Msgs'],['my_share','You %'],['avg_len_chars','Avg len'],
+    ['reactions_recv','React+'],['sent_compound','Tone'],['active_days','Days'],['last','Last']];
+  const rows=DATA.chats.slice(0,30);
+  const maxN=Math.max(...rows.map(r=>r.n));
+  let state={key:'n',dir:-1};
+  const t=$('#chat-table');
+  function render(){
+    rows.sort((a,b)=>{let x=a[state.key],y=b[state.key];if(typeof x==='string'){x=x.toLowerCase();y=(''+y).toLowerCase();}
+      return (x<y?-1:x>y?1:0)*state.dir;});
+    t.innerHTML='<thead><tr>'+cols.map(c=>`<th data-k="${c[0]}">${c[1]}${state.key===c[0]?(state.dir<0?' ↓':' ↑'):''}</th>`).join('')+'</tr></thead><tbody>'+
+      rows.map(r=>`<tr>
+        <td>${r.title.length>26?r.title.slice(0,25)+'…':r.title} ${r.is_group?'<span class="tag">group</span>':''}</td>
+        <td class="bar-cell"><span class="b" style="width:${(r.n/maxN*100).toFixed(1)}%"></span><span>${fmt(r.n)}</span></td>
+        <td>${pct(r.my_share)}</td>
+        <td>${r.avg_len_chars}</td>
+        <td>${fmt(r.reactions_recv)}</td>
+        <td style="color:${toneColor(r.sent_compound)}">${r.sent_compound==null?'—':r.sent_compound.toFixed(3)}</td>
+        <td>${r.active_days}</td>
+        <td style="color:var(--dim)">${r.last}</td></tr>`).join('')+'</tbody>';
+    t.querySelectorAll('th').forEach(th=>th.onclick=()=>{const k=th.dataset.k;state.dir=state.key===k?-state.dir:-1;state.key=k;render();});
+  }
+  render();
+}
+function toneColor(v){if(v==null)return 'var(--neu)';if(v>0.02)return C.pos;if(v<-0.06)return C.neg;return 'var(--neu)';}
+
+/* ============================ DYNAMICS ============================ */
+R.resp=el=>{const r=DATA.response;Plotly.newPlot(el,[
+  {x:r.bins,y:r.other,name:'Them',type:'bar',marker:{color:C.accent2}},
+  {x:r.bins,y:r.self,name:'You',type:'bar',marker:{color:C.accent}},
+],baseLayout({barmode:'group',xaxis:{title:'time to reply'},
+  annotations:[{x:.5,xref:'paper',y:1.0,yref:'paper',text:`median — you ${dur(r.median_self_sec)} · them ${dur(r.median_other_sec)}`,showarrow:false,font:{family:MONO,size:11,color:C.dim}}]}),CFG);};
+
+R.init=el=>{const i=DATA.initiation;Plotly.newPlot(el,[{values:[i.self,i.other],labels:['You','Them'],type:'pie',hole:.62,
+  marker:{colors:[C.accent,C.accent2],line:{color:C.bg,width:2}},textinfo:'label+percent',textfont:{family:FONT,color:'#faf8f3',size:12},
+  hovertemplate:'%{label} opened<br>%{value:,} times<extra></extra>'}],
+  baseLayout({showlegend:false,margin:{l:8,r:8,t:14,b:8},annotations:[{text:pct(i.self_share)+'<br>you',showarrow:false,font:{family:MONO,size:14,color:C.text}}]}),CFG);};
+
+R.len=el=>{const l=DATA.length;Plotly.newPlot(el,[
+  {x:l.word_bins,y:l.word_counts_self,name:'You',type:'bar',marker:{color:C.accent}},
+  {x:l.word_bins,y:l.word_counts_other,name:'Them',type:'bar',marker:{color:C.accent2}},
+],baseLayout({barmode:'group',legend:{orientation:'h',y:1.18,x:0},xaxis:{title:'words'},
+  annotations:[{x:1,xref:'paper',y:1.18,yref:'paper',xanchor:'right',text:`avg you ${l.avg_words_self}w · them ${l.avg_words_other}w`,showarrow:false,font:{family:MONO,size:10,color:C.dim}}]}),CFG);};
+
+R.composition=el=>{const k=DATA.kpis;
+  Plotly.newPlot(el,[{type:'bar',orientation:'h',y:[''],x:[k.human_text_messages],name:'Text',marker:{color:C.seq[0]},hovertemplate:'Text %{x:,}<extra></extra>'},
+   {type:'bar',orientation:'h',y:[''],x:[k.shares],name:'Shares',marker:{color:C.seq[1]},hovertemplate:'Shares %{x:,}<extra></extra>'},
+   {type:'bar',orientation:'h',y:[''],x:[k.media_messages],name:'Photos/video',marker:{color:C.seq[2]},hovertemplate:'Media %{x:,}<extra></extra>'},
+   {type:'bar',orientation:'h',y:[''],x:[k.system_messages],name:'Auto/system',marker:{color:'#c4bdae'},hovertemplate:'Auto %{x:,}<extra></extra>'}],
+   baseLayout({barmode:'stack',height:150,margin:{l:8,r:8,t:30,b:24},yaxis:{visible:false},xaxis:{visible:true}}),CFG);};
+
+/* ============================ SENTIMENT ============================ */
+R.sentdist=el=>{const d=DATA.sentiment.distribution;Plotly.newPlot(el,[{values:[d.positive,d.neutral,d.negative],
+  labels:['Positive','Neutral','Negative'],type:'pie',hole:.6,sort:false,
+  marker:{colors:[C.pos,C.neu,C.neg],line:{color:C.bg,width:1.5}},textinfo:'percent',textfont:{family:FONT,color:'#faf8f3',size:12},
+  hovertemplate:'%{label}<br>%{value:,}<extra></extra>'}],
+  baseLayout({showlegend:true,legend:{orientation:'h',y:-.05,x:.5,xanchor:'center'},margin:{l:8,r:8,t:10,b:30},
+   annotations:[{text:'compound<br>'+DATA.sentiment.overall_compound.toFixed(3),showarrow:false,font:{family:MONO,size:13,color:C.text}}]}),CFG);};
+
+R.sentmonth=el=>{const s=DATA.sentiment.by_month;Plotly.newPlot(el,[
+  {x:s.ym,y:s.pos,name:'Positive share',type:'scatter',mode:'lines',line:{width:0},fill:'tozeroy',fillcolor:'rgba(63,107,74,.13)',hoverinfo:'skip'},
+  {x:s.ym,y:s.neg.map(v=>-v),name:'Negative share',type:'scatter',mode:'lines',line:{width:0},fill:'tozeroy',fillcolor:'rgba(154,51,36,.13)',hoverinfo:'skip'},
+  {x:s.ym,y:s.compound,name:'Mean compound',type:'scatter',mode:'lines',line:{color:C.accent2,width:2.5,shape:'spline'},
+   hovertemplate:'%{x}<br>compound %{y:.3f}<extra></extra>'},
+],baseLayout({xaxis:{type:'category',nticks:12},yaxis:{zeroline:true,zerolinecolor:'rgba(28,26,23,.22)',title:'← neg · pos →'},
+  legend:{orientation:'h',y:1.13,x:0}}),CFG);};
+
+R.sentscatter=el=>{const c=DATA.chats.filter(x=>x.sent_compound!=null&&x.n>=150);
+  Plotly.newPlot(el,[{x:c.map(x=>x.n),y:c.map(x=>x.sent_compound),type:'scatter',mode:'markers',
+   text:c.map(x=>x.title),customdata:c.map(x=>[pct(x.pos_pct),pct(x.neg_pct),x.n]),
+   marker:{size:c.map(x=>Math.max(8,Math.sqrt(x.n)/7)),color:c.map(x=>x.sent_compound),
+     colorscale:DIVERGE,cmin:-.25,cmax:.1,
+     line:{width:1,color:'rgba(28,26,23,.25)'},opacity:.85,
+     colorbar:{thickness:9,len:.7,title:{text:'tone',font:{family:MONO,size:10}},tickfont:{family:MONO,size:9}}},
+   hovertemplate:'<b>%{text}</b><br>%{customdata[2]:,} msgs<br>compound %{y:.3f}<br>pos %{customdata[0]} · neg %{customdata[1]}<extra></extra>'}],
+  baseLayout({xaxis:{type:'log',title:'messages (log)'},yaxis:{title:'mean compound'},
+   shapes:[{type:'line',x0:130,x1:Math.max(...c.map(x=>x.n)),xref:'x',y0:0,y1:0,line:{color:'rgba(28,26,23,.18)',dash:'dot'}}]}),CFG);};
+
+R.senttime=el=>{const h=DATA.sentiment.by_hour,w=DATA.sentiment.by_weekday;
+  Plotly.newPlot(el,[
+   {x:h.hours,y:h.compound,name:'By hour',type:'scatter',mode:'lines+markers',line:{color:C.accent2,width:2,shape:'spline'},marker:{size:4},
+    hovertemplate:'%{x}:00 · %{y:.3f}<extra></extra>',xaxis:'x',yaxis:'y'},
+  ],baseLayout({
+    grid:{rows:2,columns:1,pattern:'independent',roworder:'top to bottom'},
+    margin:{l:48,r:14,t:24,b:34},showlegend:false,
+    xaxis:{title:'hour',dtick:3,domain:[0,1]},yaxis:{title:'compound',domain:[0.58,1]},
+    xaxis2:{domain:[0,1]},yaxis2:{domain:[0,.4],title:'compound'},
+  }),CFG);
+  Plotly.addTraces(el,[{x:w.labels,y:w.compound,type:'bar',marker:{color:C.accent},
+    hovertemplate:'%{x} · %{y:.3f}<extra></extra>',xaxis:'x2',yaxis:'y2'}]);};
+
+function sentBars(id,arr,positive){const el=$(id);if(!arr||!arr.length)return;
+  arr=arr.slice().reverse();
+  R[el.dataset.chart]=node=>Plotly.newPlot(node,[{y:arr.map(x=>x.title.length>20?x.title.slice(0,19)+'…':x.title),
+    x:arr.map(x=>x.sent_compound),type:'bar',orientation:'h',
+    marker:{color:positive?C.pos:C.neg},customdata:arr.map(x=>[x.n,pct(x.pos_pct),pct(x.neg_pct)]),
+    hovertemplate:'<b>%{y}</b><br>compound %{x:.3f}<br>%{customdata[0]:,} msgs · pos %{customdata[1]} · neg %{customdata[2]}<extra></extra>'}],
+    baseLayout({margin:{l:130,r:14,t:10,b:34},xaxis:{title:'mean compound'},yaxis:{tickfont:{family:FONT,size:11}}}),CFG);}
+
+/* ============================ LANGUAGE ============================ */
+R.words=el=>{const w=DATA.words.top.slice(0,22).reverse();Plotly.newPlot(el,[
+  {y:w.map(x=>x.word),x:w.map(x=>x.n),type:'bar',orientation:'h',marker:{color:shade(w.map(x=>x.n))},
+   hovertemplate:'%{y} · %{x:,}<extra></extra>'}],baseLayout({margin:{l:90,r:14,t:10,b:34},yaxis:{tickfont:{family:MONO,size:12}}}),CFG);};
+
+R.bigrams=el=>{const w=DATA.words.top_bigrams.slice(0,16).reverse();Plotly.newPlot(el,[
+  {y:w.map(x=>x.bigram),x:w.map(x=>x.n),type:'bar',orientation:'h',marker:{color:C.accent2},
+   hovertemplate:'%{y} · %{x:,}<extra></extra>'}],baseLayout({margin:{l:130,r:14,t:10,b:34},yaxis:{tickfont:{family:MONO,size:11}}}),CFG);};
+
+function topics(){const wrap=$('#topics');$('#topic-sub').textContent='NMF · '+DATA.topics.length+' latent components · sized by share';
+  DATA.topics.forEach((t,i)=>{const d=document.createElement('div');d.className='topic';d.style.gridColumn='span 4';
+    d.innerHTML=`<div class="th"><span>Topic ${i+1}</span><span>${fmtK(t.size)} msgs</span></div>
+      <div class="tw">${t.terms.slice(0,8).map(w=>`<span>${w}</span>`).join('')}</div>`;wrap.appendChild(d);});}
+
+/* ============================ BRAINROT / SLANG ============================ */
+function slangLead(){const s=DATA.slang;if(!s)return;
+  const top=s.top_terms&&s.top_terms[0];
+  const g=s.growth_pct==null?0:s.growth_pct, up=g>=0;
+  $('#slang-lead').innerHTML=`
+   <div class="li"><div class="v">${fmt(s.total_hits)}</div><div class="l">slang &amp; brainrot hits, scanned across <b>all ${fmt(s.msgs_scanned)}</b> messages · present in ${pct(s.share_msgs)} of them (≈1 in ${Math.round(1/s.share_msgs)})</div></div>
+   <div class="li"><div class="v" style="color:${up?'var(--pos)':'var(--neg)'}">${up?'▲ +':'▼ '}${g}%</div><div class="l">change in slang rate — earliest vs most-recent quarter of messages</div></div>
+   <div class="li"><div class="v">${top?'"'+top.term+'"':'—'}</div><div class="l">most-used slang term · ${top?fmt(top.n):'—'}× across the archive</div></div>`;}
+
+R.slangtrend=el=>{const s=DATA.slang.monthly;Plotly.newPlot(el,[
+  {x:s.ym,y:s.rate,type:'scatter',mode:'lines',fill:'tozeroy',line:{color:C.accent,width:2.5,shape:'spline'},
+   fillcolor:'rgba(138,42,42,.10)',hovertemplate:'%{x}<br>%{y:.1f} slang / 1k msgs<extra></extra>'}],
+  baseLayout({xaxis:{type:'category',nticks:12},yaxis:{title:'hits per 1,000 msgs'}}),CFG);};
+
+R.slangcat=el=>{const c=DATA.slang.by_category;const labels=Object.keys(c),vals=labels.map(k=>c[k]);
+  const cols={'Gen-Z brainrot':C.seq[0],'Chat acronym':C.seq[1],'Slovak slang':C.seq[2],'Vulgar (SK)':C.seq[3],'Phrase':C.seq[4]};
+  Plotly.newPlot(el,[{values:vals,labels:labels,type:'pie',hole:.58,sort:false,
+   marker:{colors:labels.map(l=>cols[l]||C.seq[5]),line:{color:C.bg,width:1.5}},textinfo:'percent',
+   textfont:{family:FONT,color:'#faf8f3',size:11},hovertemplate:'%{label}<br>%{value:,} hits<extra></extra>'}],
+   baseLayout({showlegend:true,legend:{orientation:'h',y:-.08,x:.5,xanchor:'center',font:{size:10}},margin:{l:8,r:8,t:10,b:40}}),CFG);};
+
+R.slangterms=el=>{const t=DATA.slang.top_terms.slice(0,18).reverse();Plotly.newPlot(el,[
+  {y:t.map(x=>x.term),x:t.map(x=>x.other),name:'Them',type:'bar',orientation:'h',marker:{color:C.accent2}},
+  {y:t.map(x=>x.term),x:t.map(x=>x.self),name:'You',type:'bar',orientation:'h',marker:{color:C.accent}},
+],baseLayout({barmode:'stack',margin:{l:96,r:14,t:30,b:34},yaxis:{tickfont:{family:MONO,size:12}}}),CFG);};
+
+/* ============================ EMOJI ============================ */
+R.emoji=el=>{const a=DATA.emoji.top_self.slice(0,12),b=DATA.emoji.top_other.slice(0,12);
+  const keys=[...new Set([...a,...b].map(x=>x.emoji))].slice(0,14);
+  const sm=Object.fromEntries(DATA.emoji.top_self.map(x=>[x.emoji,x.n]));
+  const om=Object.fromEntries(DATA.emoji.top_other.map(x=>[x.emoji,x.n]));
+  Plotly.newPlot(el,[
+   {x:keys,y:keys.map(k=>sm[k]||0),name:'You',type:'bar',marker:{color:C.accent}},
+   {x:keys,y:keys.map(k=>om[k]||0),name:'Them',type:'bar',marker:{color:C.accent2}},
+  ],baseLayout({barmode:'group',xaxis:{tickfont:{size:20}},margin:{l:50,r:14,t:30,b:44}}),CFG);};
+
+R.react=el=>{const r=DATA.emoji.top_reactions||[];if(!r.length){el.innerHTML='<div style="color:var(--dim)">no reactions</div>';return;}
+  const x=r.slice(0,10);Plotly.newPlot(el,[{x:x.map(e=>e.emoji),y:x.map(e=>e.n),type:'bar',
+   marker:{color:shade(x.map(e=>e.n))},hovertemplate:'%{x} · %{y:,}<extra></extra>'}],
+   baseLayout({xaxis:{tickfont:{size:22}},margin:{l:50,r:14,t:10,b:44}}),CFG);};
+
+function reactBars(id,arr,color){const el=$(id);if(!arr||!arr.length){return;}
+  R[el.dataset.chart]=node=>{const a=arr.slice(0,10).reverse();Plotly.newPlot(node,[{y:a.map(x=>x.name.length>20?x.name.slice(0,19)+'…':x.name),
+   x:a.map(x=>x.n),type:'bar',orientation:'h',marker:{color},hovertemplate:'%{y} · %{x:,}<extra></extra>'}],
+   baseLayout({margin:{l:130,r:14,t:10,b:30},yaxis:{tickfont:{family:FONT,size:11}}}),CFG);};}
+
+/* ============================ CLUSTERS ============================ */
+R.clusters=el=>{const c=DATA.clusters;if(!c){el.innerHTML='<div style="color:var(--dim)">insufficient data</div>';return;}
+  $('#cluster-sub').textContent=`K-means (k=${c.k}) · 3D PCA projection · silhouette ${c.silhouette} · drag to rotate · features: ${c.features.join(', ')}`;
+  const traces=[];
+  for(let g=0;g<c.k;g++){const pts=c.points.filter(p=>p.cluster===g);
+    traces.push({x:pts.map(p=>p.x),y:pts.map(p=>p.y),z:pts.map(p=>p.z),text:pts.map(p=>p.title),mode:'markers',type:'scatter3d',name:'Cluster '+(g+1),
+     marker:{size:pts.map(p=>Math.max(5,Math.sqrt(p.n)/9)),color:C.seq[g%C.seq.length],opacity:.85,line:{width:.5,color:'rgba(28,26,23,.3)'}},
+     customdata:pts.map(p=>p.n),hovertemplate:'<b>%{text}</b><br>%{customdata:,} msgs<extra>Cluster '+(g+1)+'</extra>'});}
+  Plotly.newPlot(el,traces,layout3d({x:'PC1',y:'PC2',z:'PC3'}),CFG);};
+
+R.surface3d=el=>{const t=DATA.temporal.heatmap_weekday_hour;
+  Plotly.newPlot(el,[{type:'surface',z:t.z,x:t.hours,y:t.weekdays,colorscale:INK,showscale:true,
+    colorbar:{thickness:10,len:.7,outlinewidth:0,tickfont:{family:MONO,size:9}},
+    contours:{z:{show:true,usecolormap:true,project:{z:true}}},
+    hovertemplate:'%{y} · %{x}:00<br>%{z:,} msgs<extra></extra>'}],
+   layout3d({x:'hour',y:'weekday',z:'messages'}),CFG);};
+
+R.galaxy=el=>{const c=DATA.chats.filter(x=>x.n>=120);
+  Plotly.newPlot(el,[{type:'scatter3d',mode:'markers',
+    x:c.map(x=>Math.log10(x.n)),y:c.map(x=>x.sent_compound==null?0:x.sent_compound),z:c.map(x=>x.my_share),
+    text:c.map(x=>x.title),customdata:c.map(x=>x.n),
+    marker:{size:c.map(x=>Math.max(4,Math.sqrt(x.n)/10)),color:c.map(x=>x.sent_compound==null?0:x.sent_compound),
+      colorscale:DIVERGE,cmin:-.25,cmax:.1,opacity:.85,line:{width:.5,color:'rgba(28,26,23,.3)'},
+      colorbar:{thickness:9,len:.7,title:{text:'tone',font:{family:MONO,size:10}},tickfont:{family:MONO,size:9}}},
+    hovertemplate:'<b>%{text}</b><br>%{customdata:,} msgs<br>your share %{z:.0%}<br>tone %{y:.3f}<extra></extra>'}],
+   layout3d({x:'log₁₀ messages',y:'sentiment',z:'your share'}),CFG);};
+
+/* ============================ ACTIVITY ============================ */
+function actLead(){const a=DATA.activity;if(!a)return;const tot=a.totals;
+  $('#act-lead').innerHTML=`
+   <div class="li"><div class="v">${fmt(tot.liked_posts||0)}</div><div class="l">posts liked</div></div>
+   <div class="li"><div class="v">${fmt(tot.stories_viewed||0)}</div><div class="l">stories viewed</div></div>
+   <div class="li"><div class="v">${fmt(tot.polls||0)}</div><div class="l">poll votes</div></div>
+   <div class="li"><div class="v">${fmt((tot.videos_watched||0)+(tot.posts_viewed||0))}</div><div class="l">posts &amp; videos viewed</div></div>`;}
+
+R.actmonth=el=>{const a=DATA.activity;if(!a){return;}const s=a.by_month;
+  const keep=['liked_posts','stories_viewed','polls','videos_watched','story_likes','posts_viewed'];
+  const traces=keep.filter(k=>s.series[k]).map((k,i)=>({x:s.ym,y:s.series[k],name:k.replace(/_/g,' '),type:'bar',marker:{color:C.seq[i%C.seq.length]}}));
+  Plotly.newPlot(el,traces,baseLayout({barmode:'stack',xaxis:{type:'category',nticks:12},legend:{orientation:'h',y:1.14,x:0,font:{size:10}}}),CFG);};
+
+R.acthour=el=>{const a=DATA.activity;if(!a)return;const h=a.by_hour;const hours=Object.keys(h).map(Number).sort((x,y)=>x-y);
+  Plotly.newPlot(el,[{x:hours,y:hours.map(k=>h[k]),type:'bar',marker:{color:shade(hours.map(k=>h[k]))},hovertemplate:'%{x}:00 · %{y:,}<extra></extra>'}],
+   baseLayout({xaxis:{title:'hour',dtick:3}}),CFG);};
+
+/* ============================ interests & discovery ============================ */
+function intLead(){const i=DATA.interests;if(!i)return;
+  const topC=i.top_creators&&i.top_creators[0], topT=i.top_hashtags&&i.top_hashtags[0];
+  $('#int-lead').innerHTML=`
+   <div class="li"><div class="v">${fmt(i.n_engagements)}</div><div class="l">posts &amp; reels liked/watched · ${fmt(i.n_reels)} reels</div></div>
+   <div class="li"><div class="v">#${topT?topT.tag:'—'}</div><div class="l">top hashtag · ${fmt(i.n_unique_tags)} unique tags seen</div></div>
+   <div class="li"><div class="v">@${topC?topC.name:'—'}</div><div class="l">most-engaged creator · ${fmt(i.n_unique_creators)} creators total</div></div>`;}
+
+R.hashtags=el=>{const t=(DATA.interests&&DATA.interests.top_hashtags||[]).slice(0,20).reverse();
+  Plotly.newPlot(el,[{y:t.map(x=>'#'+x.tag),x:t.map(x=>x.n),type:'bar',orientation:'h',marker:{color:shade(t.map(x=>x.n))},
+   hovertemplate:'#%{y} · %{x:,}<extra></extra>'}],baseLayout({margin:{l:120,r:14,t:10,b:34},yaxis:{tickfont:{family:MONO,size:11}}}),CFG);};
+
+R.reeltags=el=>{const t=(DATA.interests&&DATA.interests.top_reel_hashtags||[]).slice(0,16).reverse();
+  Plotly.newPlot(el,[{y:t.map(x=>'#'+x.tag),x:t.map(x=>x.n),type:'bar',orientation:'h',marker:{color:C.accent2},
+   hovertemplate:'#%{y} · %{x:,}<extra></extra>'}],baseLayout({margin:{l:120,r:14,t:10,b:34},yaxis:{tickfont:{family:MONO,size:11}}}),CFG);};
+
+R.creators=el=>{const c=(DATA.interests&&DATA.interests.top_creators||[]).slice(0,16).reverse();
+  Plotly.newPlot(el,[{y:c.map(x=>'@'+(x.name.length>22?x.name.slice(0,21)+'…':x.name)),x:c.map(x=>x.n),type:'bar',orientation:'h',
+   marker:{color:shade(c.map(x=>x.n))},hovertemplate:'%{y} · %{x:,} engagements<extra></extra>'}],
+   baseLayout({margin:{l:150,r:14,t:10,b:34},yaxis:{tickfont:{family:MONO,size:11}}}),CFG);};
+
+R.reelsposts=el=>{const i=DATA.interests;if(!i){return;}
+  Plotly.newPlot(el,[{values:[i.n_reels,i.n_posts],labels:['Reels','Posts'],type:'pie',hole:.6,sort:false,
+   marker:{colors:[C.accent,C.accent2],line:{color:C.bg,width:2}},textinfo:'label+percent',
+   textfont:{family:FONT,color:'#faf8f3',size:13},hovertemplate:'%{label}<br>%{value:,}<extra></extra>'}],
+   baseLayout({showlegend:false,margin:{l:8,r:8,t:14,b:8},
+    annotations:[{text:fmt(i.n_engagements)+'<br>total',showarrow:false,font:{family:MONO,size:14,color:C.text}}]}),CFG);};
+
+R.intmonth=el=>{const m=DATA.interests&&DATA.interests.by_month;if(!m){return;}
+  Plotly.newPlot(el,[{x:m.ym,y:m.n,type:'bar',marker:{color:C.accent},hovertemplate:'%{x}<br>%{y:,} engagements<extra></extra>'}],
+   baseLayout({xaxis:{type:'category',nticks:14}}),CFG);};
+
+/* ============================ message explorer ============================ */
+function explorer(){
+  if(!DATA.examples||!DATA.examples_order||!DATA.examples_order.length)return;
+  const sel=$('#ex-select'), list=$('#ex-list');
+  const dotCol={positive:'var(--pos)',negative:'var(--neg)',neutral:'var(--neu)'};
+  const esc=s=>(''+s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  DATA.examples_order.forEach(tid=>{const e=DATA.examples[tid];const o=document.createElement('option');
+    o.value=tid;o.textContent=(e.is_group?'• ':'')+e.title+' — '+e.messages.length+' msgs';sel.appendChild(o);});
+  function render(tid){const e=DATA.examples[tid];if(!e)return;
+    list.innerHTML=e.messages.map(m=>{
+      const dot=m.label?`<span class="dot" title="${m.label}" style="background:${dotCol[m.label]||'var(--neu)'}"></span>`:'';
+      const rx=m.react?`<span>❤ ${m.react}</span>`:'';
+      return `<div class="msg ${m.self?'me':'them'}"><div class="m-meta">${dot}<span>${esc(m.sender)}</span><span>${m.date}</span>${rx}</div>${esc(m.text)}</div>`;
+    }).join('');
+    list.scrollTop=0;
+  }
+  sel.onchange=()=>render(sel.value);
+  render(DATA.examples_order[0]);
+}
+
+/* ============================ methodology ============================ */
+function methodology(){const m=DATA.meta,k=DATA.kpis;
+  $('#methodology').innerHTML=`
+  <b>Source.</b> Official Instagram data export (2 ZIP archives, ${fmt(k.total_messages)} messages across ${m.n_threads_total} threads). Analysis focuses on the ${m.n_threads_inbox} inbox conversations.<br>
+  <b>Encoding.</b> Instagram exports text as Latin-1-encoded UTF-8 (mojibake); every string is repaired with the <code>ftfy</code> library so Slovak diacritics render correctly.<br>
+  <b>Time.</b> UTC millisecond timestamps converted to <b>${m.timezone}</b> local time. Range ${niceDate(m.date_min)} → ${niceDate(m.date_max)}.<br>
+  <b>System messages.</b> ${fmt(k.system_messages)} auto-generated lines ("X sent an attachment", "Reacted ❤ to your message", group-membership notices) were detected and excluded from all language &amp; sentiment analysis — reactions are counted separately to avoid double-counting.<br>
+  <b>Sentiment.</b> ${fmt(k.human_text_messages)} human messages scored with <code>cardiffnlp/twitter-xlm-roberta-base-sentiment</code> (XLM-RoBERTa, multilingual) on Apple-Silicon MPS. Compound = P(pos) − P(neg). The model leans neutral/negative on terse, ironic chat, so absolute values run low — read scores <i>comparatively</i>.<br>
+  <b>NLP libraries.</b> Lemmatization via <code>simplemma</code> (Slovak), stopwords via <code>stopwords-iso</code>, emoji parsing via <code>emoji</code>, transliteration via <code>unidecode</code>, tokenization via <code>simplemma.simple_tokenizer</code>.<br>
+  <b>ML.</b> Topics via TF-IDF + Non-negative Matrix Factorization (12 components); chat clustering via K-means on standardized behavioural features with PCA projection; reply-time &amp; initiation from intra-thread turn-taking gaps.<br>
+  <b>Stack.</b> Python · pandas · scikit-learn · PyTorch (MPS) · Plotly. Self-contained single file. Generated for ${m.self_name}.`;}
+
+/* ============================ boot ============================ */
+function boot(){
+  hero();kpis();peopleLead();chatTable();topics();slangLead();actLead();intLead();methodology();explorer();
+  $('#wc-all').src=DATA.wordcloud_all||'';$('#wc-self').src=DATA.wordcloud_self||'';
+  sentBars('[data-chart=sentpos]',DATA.sentiment.most_positive_chats,true);
+  sentBars('[data-chart=sentneg]',DATA.sentiment.most_negative_chats,false);
+  if(DATA.reactions){reactBars('[data-chart=reactto]',DATA.reactions.who_reacts_to_me,C.accent);
+    reactBars('[data-chart=reactby]',DATA.reactions.whom_i_react_to,C.accent2);}
+  reveals();lazy();
+  window.addEventListener('scroll',()=>{const h=document.documentElement;
+    $('#prog').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';},{passive:true});
+}
+if(document.readyState!=='loading')boot();else document.addEventListener('DOMContentLoaded',boot);
+window.addEventListener('resize',()=>{$$('[data-chart]').forEach(el=>{if(el._done&&el.querySelector('.plot-container'))Plotly.Plots.resize(el);});});
+</script>
+</body>
+</html>

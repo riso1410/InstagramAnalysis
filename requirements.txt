@@ -1,0 +1,23 @@
+# Config
+pyyaml             # reads config.yaml (custom filters)
+
+# Core data / ML / viz
+pandas
+numpy
+scipy
+pyarrow
+scikit-learn
+plotly
+
+# NLP
+torch
+transformers
+sentencepiece
+protobuf
+simplemma          # Slovak (and many-language) lemmatizer
+stopwordsiso       # vetted multilingual stopword lists
+wordcloud
+emoji
+
+# QA (optional — only needed for scripts/05_validate.py)
+playwright
