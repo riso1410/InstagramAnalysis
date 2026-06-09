@@ -8,7 +8,7 @@ def compute(ctx, D):
     self_name, sent = ctx.self_name, ctx.sent
 
     D["meta"] = {
-        "self_name": self_name,
+        "self_name": ctx.disp(self_name),
         "generated_from": "Instagram data export",
         "timezone": meta["timezone"],
         "date_min": meta["date_min"][:10],

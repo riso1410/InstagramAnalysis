@@ -33,6 +33,6 @@ def compute(ctx, D):
         to_me = rx[rx["target_sender"] == self_name]["reactor"].value_counts().head(12)
         by_me = rx[rx["reactor"] == self_name]["target_sender"].value_counts().head(12)
         D["reactions"] = {
-            "who_reacts_to_me": [{"name": k, "n": int(v)} for k, v in to_me.items()],
-            "whom_i_react_to": [{"name": k, "n": int(v)} for k, v in by_me.items()],
+            "who_reacts_to_me": [{"name": ctx.disp(k), "n": int(v)} for k, v in to_me.items()],
+            "whom_i_react_to": [{"name": ctx.disp(k), "n": int(v)} for k, v in by_me.items()],
         }

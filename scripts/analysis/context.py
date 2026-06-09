@@ -1,7 +1,17 @@
 """AnalysisContext — loads the cleaned data once, applies user configuration
-(exclusions, date window, phrase filtering) and exposes the shared frames every
-section module reads. Section modules may also stash cross-section results here
-(e.g. ctx.chats from the people module is reused by clusters/sentiment).
+(exclusions, date window, phrase filtering, anonymization) and exposes the shared
+frames every section module reads. Section modules may also stash cross-section
+results here (e.g. ctx.chats from the people module is reused by clusters/sentiment).
+
+Contract for section authors:
+  * ctx.df / ctx.inbox / ctx.tx     message frames, already config-filtered
+  * ctx.rx / ctx.th                 reactions / thread metadata, config-filtered
+  * ctx.load_clean("x.parquet")    any other cleaned table (None if absent)
+  * ctx.filter_people(df, cols)     drop rows naming an excluded person — call this
+                                    on EVERY frame that carries contact names
+  * ctx.disp(name)                  display name for output — respects
+                                    privacy.anonymize_names ("Person 01", ...)
+  * ctx.disp_title(title, is_group) same, for conversation titles
 """
 import os, json
 import pandas as pd
@@ -34,16 +44,25 @@ class AnalysisContext:
         # ---- user configuration: exclusions, date window, tag filtering ----
         self.CFG = load_config()
         self.TZ = self.CFG.get("timezone") or self.meta.get("timezone", "Europe/Bratislava")
-        EXC = [e.lower() for e in self.CFG["exclude_people"]]
-        if EXC:
+        self._exc = [e.lower() for e in self.CFG["exclude_people"]]
+        self.anonymize = bool(self.CFG["privacy"]["anonymize_names"])
+        self._anon_people = {}   # real name -> "Person NN" (stable, first-seen order)
+        self._anon_groups = {}   # group title -> "Group NN"
+
+        if self._exc:
             dm_drop = set(self.th.loc[(self.th["n_participants"] <= 2) &
-                          (self.th["participants"].fillna("").str.lower().apply(lambda p: any(e in p for e in EXC))),
+                          (self.th["participants"].fillna("").str.lower().apply(lambda p: any(e in p for e in self._exc))),
                           "thread_id"])
             before = len(self.df)
-            mask = self.df["thread_id"].isin(dm_drop) | self.df["sender"].str.lower().apply(lambda s: any(e in s for e in EXC))
+            mask = self.df["thread_id"].isin(dm_drop) | self.df["sender"].str.lower().apply(self._match_exc)
             self.df = self.df[~mask].copy()
             print(f"  excluded {before - len(self.df):,} messages matching {self.CFG['exclude_people']} "
                   f"({len(dm_drop)} DM thread(s) dropped)")
+            # the exclusion is global: reactions and thread metadata too
+            self.th = self.th[~self.th["thread_id"].isin(dm_drop)].copy()
+            if not self.rx.empty:
+                self.rx = self.rx[~self.rx["thread_id"].isin(dm_drop)]
+                self.rx = self.filter_people(self.rx, ["reactor", "target_sender"])
         if self.CFG.get("date_from"):
             self.df = self.df[self.df["dt"] >= pd.Timestamp(self.CFG["date_from"]).tz_localize(self.TZ)]
         if self.CFG.get("date_to"):
@@ -63,6 +82,65 @@ class AnalysisContext:
         self.chats = None        # set by sections.people
         self.title_map = None     # set by sections.people
         self.per_chat_resp = None  # set by sections.dynamics
+
+    # ---------------------------------------------------------------- helpers
+    def _match_exc(self, s):
+        s = str(s).lower()
+        return any(e in s for e in self._exc)
+
+    def is_excluded(self, name):
+        """True if `name` matches the exclude_people config (ci substring)."""
+        return bool(self._exc) and self._match_exc(name)
+
+    def filter_people(self, df, cols):
+        """Drop rows where any of `cols` names an excluded person."""
+        if df is None or df.empty or not self._exc:
+            return df
+        mask = pd.Series(False, index=df.index)
+        for c in cols:
+            if c in df.columns:
+                mask |= df[c].fillna("").astype(str).str.lower().apply(self._match_exc)
+        return df[~mask].copy()
+
+    def disp(self, name):
+        """Display name for emitted output. With privacy.anonymize_names the
+        account owner becomes "Me" and every contact a stable "Person NN"."""
+        name = str(name)
+        if not self.anonymize:
+            return name
+        if name == self.self_name:
+            return "Me"
+        if name not in self._anon_people:
+            self._anon_people[name] = f"Person {len(self._anon_people) + 1:02d}"
+        return self._anon_people[name]
+
+    def disp_title(self, title, is_group=False):
+        """Display title for a conversation. DM titles are the contact's name ->
+        anonymized via disp(); custom group titles become "Group NN"."""
+        title = str(title)
+        if not self.anonymize:
+            return title
+        if not is_group:
+            return self.disp(title)
+        if title not in self._anon_groups:
+            self._anon_groups[title] = f"Group {len(self._anon_groups) + 1:02d}"
+        return self._anon_groups[title]
+
+    def load_clean(self, filename):
+        """Load any cleaned table (parquet/json) or None when the export lacks it."""
+        path = os.path.join(self.CLEAN, filename)
+        if not os.path.exists(path):
+            return None
+        if filename.endswith(".json"):
+            return json.load(open(path, encoding="utf-8"))
+        df = pd.read_parquet(path)
+        if "dt" in df.columns:
+            df["dt"] = pd.to_datetime(df["dt"])
+            if self.CFG.get("date_from"):
+                df = df[df["dt"] >= pd.Timestamp(self.CFG["date_from"]).tz_localize(self.TZ)]
+            if self.CFG.get("date_to"):
+                df = df[df["dt"] <= pd.Timestamp(self.CFG["date_to"]).tz_localize(self.TZ)]
+        return df
 
     def phrase_blocked(self, s):
         s = str(s).lower()

@@ -35,6 +35,18 @@ sentiment_model: "cardiffnlp/twitter-xlm-roberta-base-sentiment"
 
 Matching is case-insensitive substring (so `BUBEL` matches `⭐️BUBEL🧋`). Everything is optional.
 
+## Prerequisites — get your Instagram data dump
+
+This tool runs on the official Instagram data export (a ZIP of JSON files). Request it first:
+
+1. Instagram app or web → **Settings** → **Accounts Center** → **Your information and permissions**
+   → **Download your information** (or go directly to <https://accountscenter.instagram.com/info_and_permissions/dyi/>).
+2. Choose **Download or transfer information** → select your Instagram account → **All available information**.
+3. **Format: JSON** (required — not HTML) · **Date range: All time** · Media quality doesn't matter (media files are ignored).
+4. Wait for Meta's email (can take from minutes up to a couple of days for large accounts), download the ZIP(s) — large archives arrive split into several ZIPs; keep them all.
+
+You also need **Python 3.10+**. Nothing is uploaded anywhere — the whole analysis runs locally.
+
 ## ▶ Swap in your own data (one command)
 
 Anyone can regenerate the whole dashboard from *their* Instagram export — no code changes,

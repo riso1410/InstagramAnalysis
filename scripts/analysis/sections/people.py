@@ -39,10 +39,13 @@ def compute(ctx, D):
         chat_rows.append(row)
     chats = pd.DataFrame(chat_rows).sort_values("n", ascending=False).reset_index(drop=True)
     chats = chats[chats["n"] >= CFG["min_chat_messages"]].reset_index(drop=True)
+    # anonymize once at the source: ctx.chats feeds clusters/sentiment/galaxy, so a
+    # display-safe title here covers every downstream chart
+    chats["title"] = [ctx.disp_title(t, g) for t, g in zip(chats["title"], chats["is_group"])]
     D["chats"] = chats.head(CFG["top_chats"]).to_dict(orient="records")
     D["n_chats_analyzed"] = int(len(chats))
     ctx.chats = chats
-    ctx.title_map = title_map
+    ctx.title_map = title_map   # real titles — consumers apply ctx.disp_title themselves
 
     snd = inbox.groupby("sender").size().sort_values(ascending=False)
-    D["top_senders"] = [{"sender": k, "n": int(v)} for k, v in snd.head(25).items()]
+    D["top_senders"] = [{"sender": ctx.disp(k), "n": int(v)} for k, v in snd.head(25).items()]
