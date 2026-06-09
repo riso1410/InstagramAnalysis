@@ -9,8 +9,6 @@ from playwright.sync_api import sync_playwright
 HTML = os.path.abspath("output/Instagram_Dashboard.html")
 SHOT_DIR = "figures/qa"
 os.makedirs(SHOT_DIR, exist_ok=True)
-SECTIONS = ["overview", "timeline", "rhythm", "people", "dynamics",
-            "sentiment", "language", "brainrot", "emoji", "clusters", "activity"]
 
 def main():
     errors, warnings = [], []
@@ -43,8 +41,9 @@ def main():
 
         # hero screenshot
         pg.screenshot(path=f"{SHOT_DIR}/00_hero.png")
-        # per-section screenshots
-        for s in SECTIONS:
+        # per-section screenshots (sections discovered from the DOM, not hand-listed)
+        sections = pg.evaluate("[...document.querySelectorAll('section[id]')].map(s=>s.id)")
+        for s in sections:
             try:
                 el = pg.query_selector(f"#{s}")
                 if el:

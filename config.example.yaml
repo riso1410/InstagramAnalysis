@@ -7,19 +7,21 @@
 #     .venv/bin/python scripts/03_analysis.py && .venv/bin/python scripts/04_build_dashboard.py
 #
 #  This file is the committed, shareable template (no personal data). Your own
-#  config.yaml overrides it and is NOT pushed to git. Everything here is OPTIONAL —
-#  delete a key to use its default. The pipeline runs fine with no config.yaml at all.
+#  config.yaml overrides it and is NOT pushed to git. Nested blocks are deep-merged,
+#  so overriding one key keeps the rest. Everything here is OPTIONAL — delete a key
+#  to use its default. The pipeline runs fine with no config.yaml at all.
 # ============================================================================
 
-# --- People / chats to EXCLUDE completely ------------------------------------
-# Case-insensitive substring match against chat title, participants and sender.
+# --- People to EXCLUDE completely ---------------------------------------------
+# Case-insensitive substring match against chat titles, participants, senders,
+# reactors, story owners, followers, search results — every analysis surface.
 # A direct chat (DM) with a matched person is removed entirely; in group chats
 # only that person's own messages are removed (the group is kept).
 exclude_people: []
 #   - "some name"
 #   - "@username"
 
-# --- Tag / phrase filtering --------------------------------------------------
+# --- Tag / phrase filtering ----------------------------------------------------
 # Phrases or words filtered OUT of "Common phrases", "Top words" and word clouds.
 # These defaults strip Instagram call/system boilerplate that otherwise biases the
 # phrase charts. Case-insensitive substring match. Add your own as needed.
@@ -34,16 +36,32 @@ exclude_phrases:
   - "app view"
   - "view update"
 
-# --- Privacy -----------------------------------------------------------------
-# The Message Explorer embeds a sample of your real message text in the HTML.
-# Set to false if you intend to share the generated dashboard publicly.
-include_examples: true
+# --- Privacy (for sharing the generated dashboard) ----------------------------
+privacy:
+  # The Message Explorer embeds a sample of your real message text in the HTML.
+  include_examples: true
+  # Replace every contact's name with a stable pseudonym ("Person 01", ...) and
+  # group titles with "Group NN" across the whole dashboard. Great for demos.
+  anonymize_names: false
+  # Sections marked privacy=high (logins & devices, locations, identity history,
+  # message explorer, social-graph name lists) — switch off before sharing.
+  include_sensitive: true
 
-# --- Date window (YYYY-MM-DD, or null for no bound) ---------------------------
+# --- Sections ------------------------------------------------------------------
+# Disable any analysis section by key (the dashboard hides it automatically).
+# Keys = module names in scripts/analysis/sections/. Sections whose source data
+# is missing from your export are skipped automatically.
+sections: {}
+#   slang: false
+#   security: false
+#   footprint: false
+
+# --- Date window (YYYY-MM-DD, or null for no bound) -----------------------------
 date_from: null
 date_to: null
 
-# --- Display / model knobs ----------------------------------------------------
+# --- Display / model knobs -------------------------------------------------------
+timezone: "Europe/Bratislava"   # your local timezone (IANA name) for all charts
 min_chat_messages: 1        # min messages for a chat to appear in per-chat charts
 topics_k: 12                # number of NMF latent topics
 top_chats: 60               # how many chats to keep in the ledger / data

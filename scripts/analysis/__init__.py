@@ -25,7 +25,8 @@ import os, traceback
 from .context import AnalysisContext
 from .sections import (overview, temporal, people, examples, length, dynamics,
                        emoji, language, slang, clusters, sentiment, activity,
-                       interests)
+                       interests, connections, content, stories, footprint,
+                       security)
 
 SECTIONS = [
     overview, temporal,
@@ -36,6 +37,11 @@ SECTIONS = [
     clusters,        # uses ctx.chats + ctx.per_chat_resp
     sentiment,       # uses ctx.chats
     activity, interests,
+    connections,     # social graph (followers/following/blocks/suggestions)
+    content,         # own posts/stories/stickers + your comments
+    stories,         # story interactions, inner circle, reels log
+    footprint,       # advertisers, targeting labels, ad density
+    security,        # logins, devices, identity, link trail (privacy: high)
 ]
 
 

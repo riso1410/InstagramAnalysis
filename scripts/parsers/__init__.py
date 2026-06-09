@@ -17,12 +17,19 @@ time, so config changes never force a re-parse.
 """
 import os, traceback
 
-from . import messages, activity, connections
+from . import (messages, activity, connections, likes, media, comments,
+               story_interactions, ads, security)
 
 PARSERS = [
     messages,      # messages/reactions/threads/meta — must run first (self identity)
     activity,
     connections,
+    likes,
+    media,
+    comments,
+    story_interactions,
+    ads,
+    security,
 ]
 
 

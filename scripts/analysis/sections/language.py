@@ -20,7 +20,7 @@ def compute(ctx, D):
         "top_bigrams": [{"bigram": k, "n": int(v)} for k, v in bigram_c.most_common() if not phrase_blocked(k)][:30],
     }
 
-    # word clouds (overall + self) as base64 PNG
+    # word clouds (overall + self) as base64 WebP (~6x smaller than PNG inline)
     try:
         from wordcloud import WordCloud
         WC_COLORS = ["#8a2a2a", "#2f4858", "#1c1a17", "#9c8348", "#5e7a6a"]
@@ -31,8 +31,8 @@ def compute(ctx, D):
             w = WordCloud(width=1000, height=500, background_color="#faf8f3", mode="RGB",
                           color_func=_color_func, max_words=n, prefer_horizontal=0.95,
                           relative_scaling=0.45).generate_from_frequencies(dict(counter.most_common(300)))
-            buf = io.BytesIO(); w.to_image().save(buf, format="PNG")
-            return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
+            buf = io.BytesIO(); w.to_image().save(buf, format="WEBP", quality=82, method=6)
+            return "data:image/webp;base64," + base64.b64encode(buf.getvalue()).decode()
         self_words = Counter()
         for txt, cnt in tx[tx.is_self]["content"].value_counts().items():
             for t in tokenize(txt): self_words[t] += cnt
