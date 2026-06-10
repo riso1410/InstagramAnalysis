@@ -26,12 +26,12 @@ def compute(ctx, D):
     # word clouds (overall + self) as base64 WebP (~6x smaller than PNG inline)
     try:
         from wordcloud import WordCloud
-        WC_COLORS = ["#8a2a2a", "#2f4858", "#1c1a17", "#9c8348", "#5e7a6a"]
+        WC_COLORS = ["#e1306c", "#4f5bd5", "#962fbf", "#fa7e1e", "#262626"]
         def _color_func(word, font_size, position, orientation, random_state=None, **kw):
             return WC_COLORS[int(font_size) % len(WC_COLORS)]
         def wc_png(counter, n=150):
             if not counter: return None
-            w = WordCloud(width=1000, height=500, background_color="#faf8f3", mode="RGB",
+            w = WordCloud(width=1000, height=500, background_color="#ffffff", mode="RGB",
                           color_func=_color_func, max_words=n, prefer_horizontal=0.95,
                           relative_scaling=0.45).generate_from_frequencies(dict(counter.most_common(300)))
             buf = io.BytesIO(); w.to_image().save(buf, format="WEBP", quality=82, method=6)

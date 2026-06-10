@@ -21,17 +21,18 @@ product
 
 ## Tone
 
-Calm editorial. A broadsheet data-essay, not a SaaS analytics tool: serif
-display headlines with one italic emphasis word, mono numerals, generous
-whitespace, dry wit in the copy ("The physics of a reply"). Charts are the
-prose; the UI never shouts over them.
+Instagram-native data essay. The dashboard borrows Instagram's own visual
+language (white canvas, hairlines, system sans, the brand gradient as a
+signature accent) so it reads like Instagram reporting on itself, with dry
+wit in the copy ("The physics of a reply"). Charts are the prose; the UI
+never shouts over them.
 
 ## Anti-references
 
-- SaaS dashboard chrome: gradient KPI tiles, glassmorphism, dark "command
-  center" themes, neon data-viz palettes.
-- Social-media-report kitsch: Instagram gradients, emoji confetti, "Wrapped"
-  hype slides.
+- SaaS dashboard chrome: glassmorphism, dark "command center" themes,
+  neon data-viz palettes, gradients smeared over data marks.
+- Social-media-report kitsch: emoji confetti, "Wrapped" hype slides,
+  the gradient smeared over everything instead of used as a signature.
 - Generic admin-template look: identical card grids, icon+heading+text rows.
 
 ## Strategic principles

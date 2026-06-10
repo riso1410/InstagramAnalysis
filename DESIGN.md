@@ -5,47 +5,56 @@ Single-file dashboard rendered from `scripts/dashboard_template.html`
 
 ## Theme
 
-Light, warm paper. Scene: someone reading their own data-portrait like a
-weekend longread, laptop on a couch, daylight. Never dark mode.
+Instagram-native: white canvas, hairline borders, system sans, the brand
+gradient as the signature accent. The dashboard should feel like a part of
+Instagram itself reporting on you. Always light; never dark mode.
 
-## Color tokens (CSS `:root`, mirrored in JS `C`)
+## Color tokens (CSS `:root`; the JS `C` object derives from these at boot)
 
-- `--bg #f3f0e9` parchment page
-- `--surface #faf8f3` card · `--surface2 #ece8df` inset
-- `--border #d8d2c5` · `--border2 #c4bdae` hover
-- `--text #1c1a17` ink · `--muted #5c574e` · `--dim #8a847a`
-- `--accent #8a2a2a` oxblood — semantic: **You / Sent**
-- `--accent2 #2f4858` slate — semantic: **Them / Received**
-- `--pos #3f6b4a` · `--neg #9a3324` · `--neu #6f6a60` sentiment triad
-- categorical seq: `#8a2a2a #2f4858 #9c8348 #5e7a6a #6f6a60 #b07a4a`
-- heatmap scale INK: `#f3f0e9 → #b8a08c → #1c1a17`
-- diverging scale: `#9a3324 → #d8d2c5 → #3f6b4a` (center = 0, always `cmid:0`)
+- `--bg #fafafa` canvas · `--surface #ffffff` card · `--surface2 #efefef` inset
+- `--border #dbdbdb` hairline · `--border2 #c7c7c7` hover
+- `--text #262626` ink · `--muted #737373` · `--dim #a8a8a8`
+- `--accent #e1306c` Instagram pink — semantic: **You / Sent**
+- `--accent2 #4f5bd5` Instagram indigo — semantic: **Them / Received**
+- `--cat3 #fa7e1e` orange · `--cat4 #962fbf` purple · `--cat5 #fcaf45` amber
+  · `--cat6 #0095f6` action blue (third/fourth/fifth categorical series)
+- `--pos #27a35f` · `--neg #ed4956` (IG alert red) · `--neu #8e8e8e` sentiment triad
+- `--ig-grad` the brand gradient `#feda75 → #fa7e1e → #d62976 → #962fbf → #4f5bd5`
+- heatmap scale INK: `#fafafa → #fa7e1e → #962fbf` (the "sunset" ramp)
+- diverging scale: `--neg → --border → --pos` (center = 0, always `cmid:0`)
 
-Color strategy: full palette, used semantically. Oxblood = the user,
-slate = everyone else, gold/sage = third/fourth series. A chart never
-recolors these roles.
+Color strategy: full palette, used semantically. Pink = the user, indigo =
+everyone else, the gradient family fills categorical series. A chart never
+recolors these roles. Aggregates of both sides use `--neu` gray.
+
+The gradient (`--ig-grad`) appears ONLY as a signature: the scroll-progress
+bar, the brand dot, and gradient-clipped text on the single emphasised
+`<em>` word per headline. Nowhere else — especially not on data.
 
 ## Typography
 
-- Newsreader (serif, 360–500): h1–h4, hero lede, callouts. One `<em>`
-  italic word per headline, set in oxblood.
-- Archivo (sans): body, UI, chart labels (12px).
-- IBM Plex Mono: every numeral (KPI values, table cells, axis ticks,
-  kickers), `tabular-nums`.
+System sans everywhere (`--font`: -apple-system / Segoe UI / Roboto …),
+exactly like Instagram. Headlines bold 700–800, no italics. Numerals use
+`font-variant-numeric: tabular-nums` (`.mono` class — the name is legacy,
+it is the same family). Micro-labels: 10–11px uppercase letterspaced.
 
 ## Layout
 
 - `--maxw 1180px`, 12-col grid `gap:20px`, cards span `col-3…col-12`;
   everything collapses to span-12 under 980px.
-- Section anatomy: `.kicker` (mono uppercase, numbered) → `h2` → `.dek`
-  standfirst (≤720px) → optional `.lead-row` big stats → `.grid` of cards.
+- Cards: white, 1px `--border`, 10px radius, flat (no shadows).
+- Section anatomy: `.kicker` (uppercase, numbered) → `h2` (one gradient
+  `<em>` word) → `.dek` standfirst (≤720px) → optional `.lead-row` big
+  stats → `.grid` of cards.
 - Chart heights via class only: `.chart` 330px, `.tall` 420px, `.sm` 260px.
   Never set Plotly `layout.height`.
+- Message Explorer renders Instagram-Direct bubbles: own messages on the
+  indigo→purple gradient, theirs on `--surface2`, 18px pill radius.
 
 ## Chart conventions
 
 - `baseLayout()` for every 2-D chart; `layout3d()` for 3-D. Transparent
-  backgrounds, Archivo 12, dark mono hoverlabel.
+  backgrounds, system sans 12, dark hoverlabel.
 - Every trace gets an explicit `hovertemplate` with `:,` thousands
   formatting and `<extra></extra>`; truncated labels carry full text in
   `text` for hover.
@@ -59,6 +68,7 @@ recolors these roles.
 
 ## Banned here
 
-Side-stripe accent borders, gradient text, glassmorphism, dark theme,
-neon palettes, decorative 3-D where a 2-D chart reads better, em dashes
-in copy (use · or commas).
+Side-stripe accent borders, dark theme, drop shadows, gradient applied to
+data marks or body text (signature spots above are the only exception),
+decorative 3-D where a 2-D chart reads better, em dashes in copy (use ·
+or commas).
