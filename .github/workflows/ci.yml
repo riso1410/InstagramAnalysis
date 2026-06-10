@@ -14,6 +14,8 @@ jobs:
         with:
           python-version: "3.11"
 
+      - uses: astral-sh/setup-uv@v5
+
       # Syntax check every pipeline module without installing heavy deps
       - name: Compile all scripts
         run: python -m compileall -q scripts/
@@ -21,7 +23,7 @@ jobs:
       # Config loader must work from the committed template alone
       - name: Config loader smoke test
         run: |
-          pip install pyyaml
+          uv pip install --system pyyaml
           python -c "
           import sys; sys.path.insert(0, 'scripts')
           from _config import load_config

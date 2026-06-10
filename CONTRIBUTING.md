@@ -5,8 +5,8 @@ Thanks for helping. This document covers the development setup, the extension po
 ## Dev setup
 
 ```bash
-python -m venv .venv
-.venv/bin/pip install -r requirements.txt
+uv venv                                      # https://docs.astral.sh/uv/
+uv pip install -r requirements.txt
 .venv/bin/playwright install chromium        # only needed for scripts/05_validate.py
 
 .venv/bin/python run.py --skip-sentiment     # fast full pipeline on your own export

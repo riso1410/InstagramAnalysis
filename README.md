@@ -31,7 +31,7 @@ You also need **Python 3.10+**. That is it. No accounts, no API keys.
 ## Quick start
 
 ```bash
-python -m venv .venv && .venv/bin/pip install -r requirements.txt   # one-time setup
+uv venv && uv pip install -r requirements.txt   # one-time setup (https://docs.astral.sh/uv/)
 
 .venv/bin/python run.py                    # auto-detects *.zip in this folder
 .venv/bin/python run.py a.zip b.zip        # or point at your export archives
