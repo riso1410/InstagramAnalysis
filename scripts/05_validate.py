@@ -31,16 +31,19 @@ def main():
         pg.evaluate("window.scrollTo(0,0)")
         pg.wait_for_timeout(800)
 
-        # count rendered plotly charts
+        # count rendered plotly charts (targets inside config-hidden sections don't count)
+        visible = "[...document.querySelectorAll('[data-chart]')].filter(e=>{const s=e.closest('section');return !s||getComputedStyle(s).display!=='none';})"
         n_charts = pg.evaluate("document.querySelectorAll('.js-plotly-plot').length")
-        n_targets = pg.evaluate("document.querySelectorAll('[data-chart]').length")
-        empty = pg.evaluate("[...document.querySelectorAll('[data-chart]')].filter(e=>!e.querySelector('.js-plotly-plot')).map(e=>e.dataset.chart)")
+        n_targets = pg.evaluate(visible + ".length")
+        empty = pg.evaluate(visible + ".filter(e=>!(e.classList.contains('js-plotly-plot')||e.querySelector('.js-plotly-plot'))).map(e=>e.dataset.chart)")
         print(f"charts rendered: {n_charts}/{n_targets}")
         if empty:
             print("  EMPTY chart targets:", empty)
 
         # hero screenshot
         pg.screenshot(path=f"{SHOT_DIR}/00_hero.png")
+        # hide the sticky nav so it isn't baked mid-image into tall element captures
+        pg.evaluate("const n=document.querySelector('nav');if(n)n.style.display='none'")
         # per-section screenshots (sections discovered from the DOM, not hand-listed)
         sections = pg.evaluate("[...document.querySelectorAll('section[id]')].map(s=>s.id)")
         for s in sections:

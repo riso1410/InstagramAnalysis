@@ -9,12 +9,14 @@ pyarrow
 scikit-learn
 plotly
 
-# NLP
+# NLP / text repair
 torch
 transformers
 sentencepiece
 protobuf
-simplemma          # Slovak (and many-language) lemmatizer
+ftfy>=6.0          # repairs Instagram's Latin-1/UTF-8 mojibake (parsers/common.py)
+unidecode>=1.3     # transliteration / de-accenting (analysis/text_utils.py)
+simplemma          # multilingual lemmatizer
 stopwordsiso       # vetted multilingual stopword lists
 wordcloud
 emoji

@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # Syntax check every pipeline module without installing heavy deps
+      - name: Compile all scripts
+        run: python -m compileall -q scripts/
+
+      # Config loader must work from the committed template alone
+      - name: Config loader smoke test
+        run: |
+          pip install pyyaml
+          python -c "
+          import sys; sys.path.insert(0, 'scripts')
+          from _config import load_config
+          cfg = load_config()
+          assert isinstance(cfg['exclude_people'], list)
+          assert cfg['exclude_phrases'], 'example template phrases should be loaded'
+          assert set(cfg['privacy']) >= {'include_examples', 'anonymize_names', 'include_sensitive'}
+          assert isinstance(cfg['sections'], dict)
+          assert cfg['sentiment_model']
+          print('config OK:', sorted(cfg))
+          "

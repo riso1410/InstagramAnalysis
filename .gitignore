@@ -8,6 +8,10 @@ config.json
 data/
 output/
 figures/
+# defensive: cleaned tables / built dashboards are personal wherever they end up
+*.parquet
+*.html
+!scripts/dashboard_template.html
 
 # ---- python / env ----
 .venv/
