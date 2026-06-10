@@ -41,7 +41,10 @@ privacy:
   # The Message Explorer embeds a sample of your real message text in the HTML.
   include_examples: true
   # Replace every contact's name with a stable pseudonym ("Person 01", ...) and
-  # group titles with "Group NN" across the whole dashboard. Great for demos.
+  # group titles with "Group NN" across the whole dashboard; thread ids are
+  # pseudonymized and known name tokens are scrubbed from word charts and
+  # message samples. Nicknames in message text can still slip through — for
+  # true share-safety also set include_examples: false. Great for demos.
   anonymize_names: false
   # Sections marked privacy=high (logins & devices, locations, identity history,
   # message explorer, social-graph name lists) — switch off before sharing.

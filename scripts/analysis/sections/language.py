@@ -15,9 +15,12 @@ def compute(ctx, D):
         toks = tokenize(txt)
         for t in toks: word_c[t] += cnt
         for a, b in zip(toks, toks[1:]): bigram_c[f"{a} {b}"] += cnt
+    def blocked(s):   # phrase filter + contact-name filter (anonymize mode)
+        return phrase_blocked(s) or ctx.name_blocked(s)
+
     D["words"] = {
-        "top": [{"word": k, "n": int(v)} for k, v in word_c.most_common() if not phrase_blocked(k)][:60],
-        "top_bigrams": [{"bigram": k, "n": int(v)} for k, v in bigram_c.most_common() if not phrase_blocked(k)][:30],
+        "top": [{"word": k, "n": int(v)} for k, v in word_c.most_common() if not blocked(k)][:60],
+        "top_bigrams": [{"bigram": k, "n": int(v)} for k, v in bigram_c.most_common() if not blocked(k)][:30],
     }
 
     # word clouds (overall + self) as base64 WebP (~6x smaller than PNG inline)
@@ -36,8 +39,8 @@ def compute(ctx, D):
         self_words = Counter()
         for txt, cnt in tx[tx.is_self]["content"].value_counts().items():
             for t in tokenize(txt): self_words[t] += cnt
-        wc_all = Counter({k: v for k, v in word_c.items() if not phrase_blocked(k)})
-        wc_self = Counter({k: v for k, v in self_words.items() if not phrase_blocked(k)})
+        wc_all = Counter({k: v for k, v in word_c.items() if not blocked(k)})
+        wc_self = Counter({k: v for k, v in self_words.items() if not blocked(k)})
         D["wordcloud_all"] = wc_png(wc_all)
         D["wordcloud_self"] = wc_png(wc_self)
         print("  word clouds rendered")
@@ -65,7 +68,7 @@ def compute(ctx, D):
         sizes = W.argmax(1)
         topics = []
         for i in range(k):
-            top = terms[H[i].argsort()[::-1][:10]].tolist()
+            top = [t for t in terms[H[i].argsort()[::-1]].tolist() if not ctx.name_blocked(t)][:10]
             topics.append({"id": i, "terms": top, "size": int((sizes == i).sum())})
         topics.sort(key=lambda t: t["size"], reverse=True)
         D["topics"] = topics

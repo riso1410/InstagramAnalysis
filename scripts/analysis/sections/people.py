@@ -42,7 +42,10 @@ def compute(ctx, D):
     # anonymize once at the source: ctx.chats feeds clusters/sentiment/galaxy, so a
     # display-safe title here covers every downstream chart
     chats["title"] = [ctx.disp_title(t, g) for t, g in zip(chats["title"], chats["is_group"])]
-    D["chats"] = chats.head(CFG["top_chats"]).to_dict(orient="records")
+    out = chats.head(CFG["top_chats"]).to_dict(orient="records")
+    for r in out:   # IG thread ids embed usernames — pseudonymize in emitted records
+        r["thread_id"] = ctx.disp_tid(r["thread_id"])
+    D["chats"] = out
     D["n_chats_analyzed"] = int(len(chats))
     ctx.chats = chats
     ctx.title_map = title_map   # real titles — consumers apply ctx.disp_title themselves

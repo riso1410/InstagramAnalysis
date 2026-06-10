@@ -13,7 +13,7 @@ Contract for section authors:
                                     privacy.anonymize_names ("Person 01", ...)
   * ctx.disp_title(title, is_group) same, for conversation titles
 """
-import os, json
+import os, json, re
 import pandas as pd
 from _config import load_config
 from .text_utils import SYSTEM_RE
@@ -48,6 +48,27 @@ class AnalysisContext:
         self.anonymize = bool(self.CFG["privacy"]["anonymize_names"])
         self._anon_people = {}   # real name -> "Person NN" (stable, first-seen order)
         self._anon_groups = {}   # group title -> "Group NN"
+        self._anon_tids = {}     # thread_id -> "t001" (IG thread ids embed usernames)
+
+        # name tokens (accented + de-accented) of the owner and every participant —
+        # used to scrub names out of emitted text/word lists when anonymizing
+        self._name_tokens = set()
+        self._scrub_re = None
+        if self.anonymize:
+            from unidecode import unidecode
+            names = {self.self_name}
+            for p in self.th["participants"].fillna(""):
+                names.update(str(p).split("|"))
+            for n in names:
+                for tok in str(n).split():
+                    tok = tok.strip().lower()
+                    if len(tok) >= 3:
+                        self._name_tokens.add(tok)
+                        self._name_tokens.add(unidecode(tok))
+            self._name_tokens.discard("")
+            if self._name_tokens:
+                pat = "|".join(re.escape(t) for t in sorted(self._name_tokens, key=len, reverse=True))
+                self._scrub_re = re.compile(rf"\b({pat})\w*", re.IGNORECASE | re.UNICODE)
 
         if self._exc:
             dm_drop = set(self.th.loc[(self.th["n_participants"] <= 2) &
@@ -113,6 +134,32 @@ class AnalysisContext:
         if name not in self._anon_people:
             self._anon_people[name] = f"Person {len(self._anon_people) + 1:02d}"
         return self._anon_people[name]
+
+    def disp_tid(self, tid):
+        """Display thread id. Instagram thread ids embed the contact's username
+        (e.g. 'janedoe_1250817…'), so anonymized output uses stable 't001' keys.
+        people.py and examples.py must use the SAME mapping (they do — it's shared)."""
+        tid = str(tid)
+        if not self.anonymize:
+            return tid
+        if tid not in self._anon_tids:
+            self._anon_tids[tid] = f"t{len(self._anon_tids) + 1:03d}"
+        return self._anon_tids[tid]
+
+    def name_blocked(self, s):
+        """True when a word/bigram/term contains a known contact-name token —
+        used to keep names out of word charts when anonymizing."""
+        if not self._name_tokens:
+            return False
+        return any(t in self._name_tokens for t in str(s).lower().split())
+
+    def scrub_names(self, text):
+        """Best-effort removal of known contact-name tokens from emitted text
+        (Message Explorer samples). Nicknames not present in participant lists
+        can survive — true share-safety also sets privacy.include_examples=false."""
+        if self._scrub_re is None:
+            return text
+        return self._scrub_re.sub("***", str(text))
 
     def disp_title(self, title, is_group=False):
         """Display title for a conversation. DM titles are the contact's name ->

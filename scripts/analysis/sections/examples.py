@@ -18,8 +18,9 @@ def compute(ctx, D):
                 continue
             msgs = sub.sort_values("dt").head(40)
             is_group = bool(sub["is_group"].iloc[0])
-            order.append(tid)
-            ex[tid] = {
+            dtid = ctx.disp_tid(tid)   # raw IG thread ids embed usernames
+            order.append(dtid)
+            ex[dtid] = {
                 "title": ctx.disp_title(title_map.get(tid) or tid, is_group),
                 "is_group": is_group,
                 "messages": [{"self": bool(r.is_self),
@@ -27,7 +28,7 @@ def compute(ctx, D):
                               "sender": (lambda d: d if ctx.anonymize else d.split()[0])(
                                   ctx.disp(self_name if r.is_self else r.sender)),
                               "date": str(r.dt)[:16],
-                              "text": str(r.content)[:260],
+                              "text": ctx.scrub_names(str(r.content)[:260]),
                               "label": (r.sent_label if sent is not None else None),
                               "react": int(r.n_reactions)} for r in msgs.itertuples()],
             }
