@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 """
-02_sentiment.py — Multilingual sentiment scoring of all text messages.
+02_sentiment.py — Sentiment scoring of all text messages.
 
-Model: cardiffnlp/twitter-xlm-roberta-base-sentiment
-  - XLM-RoBERTa fine-tuned on ~198M multilingual tweets (incl. Slovak via XLM-R),
-    3-class: Negative / Neutral / Positive. Ideal for short informal social text.
+Model: kinit/slovakbert-sentiment-twitter (default; configurable via config.yaml)
+  - SlovakBERT fine-tuned on the Slovak part of the Multilingual Twitter
+    Sentiment dataset (~50k manually annotated Slovak tweets), 3-class:
+    Negative / Neutral / Positive. Tuned for short informal Slovak social text.
+  - Any 3-class HF sequence-classification model works: labels are read from
+    the model config and remapped to (neg, neu, pos), handling both word labels
+    (negative/neutral/positive) and numeric ones (-1/0/1).
 
 DS optimisation: score only UNIQUE normalised texts (294k of 483k), then map back.
 Runs on Apple MPS, length-sorted batching to minimise padding waste.
@@ -22,7 +26,7 @@ try:
     from _config import load_config
     MODEL = load_config(verbose=False)["sentiment_model"]
 except Exception:
-    MODEL = "cardiffnlp/twitter-xlm-roberta-base-sentiment"
+    MODEL = "kinit/slovakbert-sentiment-twitter"
 OUT = "data/clean/sentiment.parquet"
 BATCH = 128
 MAXLEN = 128
@@ -42,13 +46,24 @@ def main():
     print("loading model ...")
     tok = AutoTokenizer.from_pretrained(MODEL)
     model = AutoModelForSequenceClassification.from_pretrained(MODEL).to(dev).eval()
-    id2label = model.config.id2label  # {0:'negative',1:'neutral',2:'positive'}
+    # Map model output ids -> our fixed (neg, neu, pos) order. Handles both word
+    # labels (negative/neutral/positive, e.g. cardiffnlp) and numeric labels
+    # (-1/0/1, e.g. SlovakBERT-based models).
+    id2label = model.config.id2label
     order = [None, None, None]
     for i, lab in id2label.items():
-        l = lab.lower()
-        if "neg" in l: order[0] = i
-        elif "neu" in l: order[1] = i
-        elif "pos" in l: order[2] = i
+        l = str(lab).strip().lower()
+        if "neg" in l or l in ("-1", "-1.0"):
+            order[0] = i
+        elif "pos" in l or l in ("1", "1.0", "+1"):
+            order[2] = i
+        elif "neu" in l or l in ("0", "0.0"):
+            order[1] = i
+    if None in order:
+        # Unrecognised label names: fall back to the conventional id ordering
+        # (0=neg, 1=neu, 2=pos), which most 3-class sentiment models follow.
+        print(f"warning: could not map labels {id2label}; assuming 0/1/2 = neg/neu/pos")
+        order = [0, 1, 2]
     print("label order (neg,neu,pos) -> ids:", order)
 
     # length-sorted for efficient padding; remember original positions

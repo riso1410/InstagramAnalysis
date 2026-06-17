@@ -184,6 +184,19 @@ footer h4{font-weight:500;font-size:18px;margin:0 0 14px;color:var(--text)}
 .msg.them{align-self:flex-start;background:var(--surface2);color:var(--text);border-bottom-left-radius:4px}
 .msg .dot{width:7px;height:7px;border-radius:50%;display:inline-block}
 
+/* Writing section: longest-message list + go-to lines */
+.mlist{display:flex;flex-direction:column;gap:12px}
+.mrow{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+.mrow .q{font-size:13.5px;line-height:1.5;color:var(--text);white-space:pre-wrap;word-wrap:break-word;
+  display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.mrow .mm{margin-top:8px;font-size:11.5px;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;
+  font-family:var(--font);font-variant-numeric:tabular-nums}
+.mrow .mm b{color:var(--text);font-weight:600}
+.goto{display:flex;flex-wrap:wrap;gap:9px;align-content:flex-start}
+.goto .g{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:7px 11px;
+  display:inline-flex;align-items:baseline;gap:8px;font-size:14px;color:var(--text);max-width:100%;word-break:break-word}
+.goto .g .n{font-family:var(--font);font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+
 @media (prefers-reduced-motion: reduce){
   *{animation:none!important;transition:none!important}
   .card,.kpi{opacity:1!important;transform:none!important}
@@ -201,6 +214,7 @@ footer h4{font-weight:500;font-size:18px;margin:0 0 14px;color:var(--text)}
       <a href="#rhythm">Rhythms</a>
       <a href="#people">People</a>
       <a href="#dynamics">Dynamics</a>
+      <a href="#writing">Writing</a>
       <a href="#sentiment">Sentiment</a>
       <a href="#language">Language</a>
       <a href="#brainrot">Brainrot</a>
@@ -314,12 +328,27 @@ footer h4{font-weight:500;font-size:18px;margin:0 0 14px;color:var(--text)}
     </div>
   </section>
 
+  <!-- WRITING -->
+  <section id="writing" data-requires="writing">
+    <div class="sec-head">
+      <div class="kicker"><span class="num">06</span> Your Writing</div>
+      <h2>How <em>you</em> write.</h2>
+      <p class="dek">Your fingerprint on the keyboard · how long your messages run, how often you laugh, drop an emoji or ask a question, the words you reach for more than anyone else, and the five longest messages you've ever sent. Measured only on the messages <b>you</b> wrote.</p>
+    </div>
+    <div class="lead-row" id="writing-fp"></div>
+    <div class="grid">
+      <div class="card col-7"><h3>Your longest messages</h3><div class="sub">top 5 by length · the essays</div><div id="writing-longest" class="mlist"></div></div>
+      <div class="card col-5"><h3>Your go-to lines</h3><div class="sub">the exact messages you repeat most</div><div id="writing-goto" class="goto"></div></div>
+      <div class="card col-12"><h3>Your signature words</h3><div class="sub">words you use far more than everyone else · ×lift vs others</div><div class="chart tall" data-chart="sigwords"></div></div>
+    </div>
+  </section>
+
   <!-- SENTIMENT -->
   <section id="sentiment" data-requires="sentiment">
     <div class="sec-head">
       <div class="kicker"><span class="num">06</span> Sentiment</div>
       <h2>The <em>emotional</em> weather.</h2>
-      <p class="dek">Every human-written message scored by <b>XLM-RoBERTa</b> (multilingual, social-media tuned) into positive / neutral / negative. The <b>compound</b> score runs −1 to +1; treat it comparatively, between chats and across time, rather than as an absolute verdict.</p>
+      <p class="dek">Every human-written message scored by a <b>transformer sentiment model</b> (SlovakBERT by default, fine-tuned on Slovak social text) into positive / neutral / negative. The <b>compound</b> score runs −1 to +1; treat it comparatively, between chats and across time, rather than as an absolute verdict.</p>
     </div>
     <div class="grid">
       <div class="card col-4 fit"><h3>Overall mix</h3><div class="sub">all human messages · label shares</div><div class="chart sm" data-chart="sentdist"></div></div>
@@ -344,6 +373,7 @@ footer h4{font-weight:500;font-size:18px;margin:0 0 14px;color:var(--text)}
       <div class="card col-6"><h3>Common phrases</h3><div class="sub">top bigrams</div><div class="chart" data-chart="bigrams"></div></div>
       <div class="card col-6"><h3>Your vocabulary</h3><div class="sub">your own outgoing words</div><img class="wc-img" id="wc-self" alt="word cloud (you)"></div>
       <div class="card col-12"><h3>Latent topics</h3><div class="sub" id="topic-sub">NMF · 12 components</div><div class="grid" id="topics" style="gap:12px"></div></div>
+      <div class="card col-12"><h3>The vocabulary galaxy</h3><div class="sub" id="wordgalaxy-sub">3D · words embedded in topic space, coloured by topic · drag to rotate</div><div class="chart tall" data-chart="word_clusters"></div></div>
     </div>
   </section>
 
@@ -863,6 +893,43 @@ R.bigrams=el=>{const w=DATA.words.top_bigrams.slice(0,16).reverse();Plotly.newPl
    hovertemplate:'<b>%{y}</b>: %{x:,}×<extra></extra>'}],
   baseLayout({showlegend:false,margin:{l:8,r:14,t:10,b:34},xaxis:{tickformat:'~s'},yaxis:{tickfont:{family:MONO,size:11}}}),CFG);};
 
+/* ============================ WRITING ============================ */
+R.sigwords=el=>{const s=DATA.writing&&DATA.writing.signature;
+  if(!s||!s.length){empty(el,'not enough of your own messages');return;}
+  const a=s.slice(0,15).reverse();
+  Plotly.newPlot(el,[{y:a.map(x=>x.word),x:a.map(x=>x.lift),type:'bar',orientation:'h',
+    marker:{color:shade(a.map(x=>x.lift))},customdata:a.map(x=>x.n),
+    hovertemplate:'<b>%{y}</b><br>%{x}× more likely than others<br>%{customdata:,} uses<extra></extra>'}],
+   baseLayout({showlegend:false,margin:{l:8,r:14,t:10,b:34},
+     xaxis:{title:'× vs everyone else',tickformat:'~s'},yaxis:{tickfont:{family:MONO,size:12}}}),CFG);};
+
+function writingCard(){const w=DATA.writing;if(!w||!w.self)return;
+  const s=w.self,o=w.other||{};
+  const stat=(val,unit,label)=>`<div class="li"><div class="v">${val}${unit}</div><div class="l">${label}</div></div>`;
+  $('#writing-fp').innerHTML=[
+    stat(s.avg_words,'',`words per message, on average · they average <b>${o.avg_words??'—'}</b>`),
+    stat(s.emoji_rate,'%',`of your messages carry an emoji · them <b>${o.emoji_rate??'—'}%</b>`),
+    stat(s.laugh_rate,'%',`are laughter — haha / xd / 🤣 · them <b>${o.laugh_rate??'—'}%</b>`),
+    stat(s.q_rate,'%',`ask a question · them <b>${o.q_rate??'—'}%</b>`),
+  ].join('');
+
+  const lw=$('#writing-longest');
+  if(w.longest&&w.longest.length){
+    lw.innerHTML=w.longest.map(m=>{
+      const body=w.include_text&&m.text
+        ? `<div class="q">${escH(m.text)}</div>`
+        : `<div class="q" style="color:var(--muted);font-style:italic">message text hidden · privacy.include_examples = false</div>`;
+      const rx=m.react?`<span>❤ ${fmt(m.react)}</span>`:'';
+      return `<div class="mrow">${body}<div class="mm"><span><b>${fmt(m.chars)}</b> chars</span><span><b>${fmt(m.words)}</b> words</span><span>to <b>${escH(m.chat)}</b></span><span>${m.date}</span>${rx}</div></div>`;
+    }).join('');
+  } else if(lw.closest('.card')){lw.closest('.card').style.display='none';}
+
+  const gt=$('#writing-goto');
+  if(w.include_text&&w.go_to&&w.go_to.length){
+    gt.innerHTML=w.go_to.map(g=>`<div class="g">${escH(g.text)}<span class="n">${fmt(g.n)}×</span></div>`).join('');
+  } else if(gt.closest('.card')){gt.closest('.card').style.display='none';}
+}
+
 function topics(){const wrap=$('#topics');$('#topic-sub').textContent='NMF · '+DATA.topics.length+' latent components · sized by share';
   DATA.topics.forEach((t,i)=>{const d=document.createElement('div');d.className='topic';
     d.innerHTML=`<div class="th"><span>Topic ${i+1}</span><span>${fmtK(t.size)} msgs</span></div>
@@ -923,6 +990,22 @@ R.clusters=el=>{const c=DATA.clusters;if(!c){empty(el,'insufficient data for clu
     traces.push({x:pts.map(p=>p.x),y:pts.map(p=>p.y),z:pts.map(p=>p.z),text:pts.map(p=>p.title),mode:'markers',type:'scatter3d',name:'Cluster '+(g+1),
      marker:{size:pts.map(p=>Math.max(5,Math.sqrt(p.n)/9)),color:C.seq[g%C.seq.length],opacity:.85,line:{width:.5,color:C.edge3d}},
      customdata:pts.map(p=>p.n),hovertemplate:'<b>%{text}</b><br>%{customdata:,} msgs<extra>Cluster '+(g+1)+'</extra>'});}
+  Plotly.newPlot(el,traces,layout3d({x:'PC1',y:'PC2',z:'PC3'}),CFG);};
+
+/* 3D word/topic clusters — words embedded in NMF topic space, projected to 3D */
+R.word_clusters=el=>{const w=DATA.word_clusters;
+  if(!w||!w.points||!w.points.length){if(el.closest('.card'))el.closest('.card').style.display='none';return;}
+  const sub=$('#wordgalaxy-sub');if(sub)sub.textContent=`3D · ${w.points.length} words embedded in ${w.k}-topic space, coloured by dominant topic · drag to rotate`;
+  const wmax=Math.max(...w.points.map(p=>p.weight))||1;
+  const traces=[];
+  for(let g=0;g<w.k;g++){const pts=w.points.filter(p=>p.topic===g);if(!pts.length)continue;
+    traces.push({x:pts.map(p=>p.x),y:pts.map(p=>p.y),z:pts.map(p=>p.z),
+     text:pts.map(p=>p.word),mode:'markers+text',type:'scatter3d',
+     name:(w.labels&&w.labels[g])?w.labels[g]:'topic '+(g+1),
+     textfont:{family:FONT,size:pts.map(p=>9+10*Math.sqrt(p.weight/wmax)),color:C.seq[g%C.seq.length]},
+     textposition:'middle center',
+     marker:{size:pts.map(p=>Math.max(3,7*Math.sqrt(p.weight/wmax))),color:C.seq[g%C.seq.length],opacity:.55,line:{width:.4,color:C.edge3d}},
+     hovertemplate:'<b>%{text}</b><extra>'+((w.labels&&w.labels[g])?w.labels[g]:'topic '+(g+1))+'</extra>'});}
   Plotly.newPlot(el,traces,layout3d({x:'PC1',y:'PC2',z:'PC3'}),CFG);};
 
 R.surface3d=el=>{const t=DATA.temporal.heatmap_weekday_hour;
@@ -1561,7 +1644,7 @@ function spy(){const map={};$$('.nav-links a').forEach(a=>map[a.getAttribute('hr
 function boot(){
   reveals();lazy();   /* first: charts and reveals must work even if a builder below throws */
   safe(hideEmptySections);safe(kickers);safe(chartAria);safe(navJump);safe(spy);
-  safe(hero);safe(kpis);safe(peopleLead);safe(chatTable);safe(topics);safe(slangLead);
+  safe(hero);safe(kpis);safe(peopleLead);safe(chatTable);safe(topics);safe(slangLead);safe(writingCard);
   safe(actLead);safe(intLead);safe(methodology);safe(explorer);
   safe(connLead);safe(connLists);safe(contentLead);safe(storiesLead);
   safe(fpLead);safe(fpTargeting);safe(secLead);

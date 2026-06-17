@@ -21,7 +21,7 @@ DEFAULTS = {
     "topics_k": 12,
     "top_chats": 60,
     "timezone": "Europe/Bratislava",
-    "sentiment_model": "cardiffnlp/twitter-xlm-roberta-base-sentiment",
+    "sentiment_model": "kinit/slovakbert-sentiment-twitter",
     # privacy controls for sharing the generated dashboard
     "privacy": {
         "include_examples": True,   # embed a sample of real messages in the explorer

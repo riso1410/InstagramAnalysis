@@ -61,8 +61,9 @@ Every section is a self-contained module. Sections whose source files are missin
 | Message Explorer (`examples`) | Browse real messages, filtered by conversation (privacy: high) |
 | Length (`length`) | Message length distributions, outbox composition |
 | Dynamics (`dynamics`) | Reply-time distributions, who initiates, turn-taking |
-| Sentiment (`sentiment`) | XLM-RoBERTa sentiment: distribution, over time, per chat, by hour and weekday |
-| Language (`language`) | Word clouds, top words, bigrams, NMF latent topics |
+| Writing (`writing`) | Your style fingerprint (length, emoji/laughter/question rates vs others), signature words, go-to lines, your 5 longest messages |
+| Sentiment (`sentiment`) | Transformer sentiment (Slovak by default): distribution, over time, per chat, by hour and weekday |
+| Language (`language`) | Word clouds, top words, bigrams, NMF latent topics, 3D vocabulary galaxy |
 | Brainrot Index (`slang`) | Slang/vulgarity lexicon: trend over time, flavours, most chronically online chats |
 | Emoji & Reactions (`emoji`) | Most-used emoji (you vs others), reaction palette, who reacts to whom |
 | Clusters (`clusters`) | K-means behavioural clustering of chats, 3D PCA projection |
@@ -118,8 +119,21 @@ timezone: "Europe/Bratislava"  # IANA name; all charts use your local time
 min_chat_messages: 1         # min messages for a chat to appear in per-chat charts
 topics_k: 12                 # number of NMF latent topics
 top_chats: 60                # chats kept in the ledger
-sentiment_model: "cardiffnlp/twitter-xlm-roberta-base-sentiment"
+sentiment_model: "kinit/slovakbert-sentiment-twitter"
 ```
+
+**Pick a sentiment model for your language.** The default,
+[`kinit/slovakbert-sentiment-twitter`](https://huggingface.co/kinit/slovakbert-sentiment-twitter),
+is SlovakBERT fine-tuned on ~50k annotated Slovak tweets — it reads short, informal
+Slovak chat far better than a generic multilingual model. If your messages are in
+another language, find an open-source sentiment model that fits it on
+[the Hugging Face Hub](https://huggingface.co/models?pipeline_tag=text-classification)
+(or train/use your own) and set its repo id as `sentiment_model`. Any 3-class
+text-classification model works — the pipeline reads the model's own labels and
+maps them to negative / neutral / positive, accepting both word labels
+(`negative`/`neutral`/`positive`) and numeric ones (`-1`/`0`/`1`). For a
+multilingual fallback, `cardiffnlp/twitter-xlm-roberta-base-sentiment` covers ~100
+languages. The model is downloaded once from Hugging Face on first run.
 
 Filters apply at analysis time, so config changes never force a re-parse or a sentiment re-run.
 
@@ -143,7 +157,7 @@ The pipeline is five small scripts orchestrated by `run.py`:
 ```
 scripts/00_extract.py         # ZIPs -> data/raw/ (JSON only, stdlib zipfile, cross-platform)
 scripts/01_parse.py           # -> tidy parquet tables in data/clean/   (scripts/parsers/)
-scripts/02_sentiment.py       # XLM-RoBERTa sentiment, unique-text dedup (skippable)
+scripts/02_sentiment.py       # transformer sentiment (SlovakBERT default), unique-text dedup (skippable)
 scripts/03_analysis.py        # EDA + ML features -> output/data.json   (scripts/analysis/)
 scripts/04_build_dashboard.py # inline Plotly + data into one HTML
 scripts/05_validate.py        # headless-Chromium render check + screenshots (optional QA)
@@ -161,7 +175,7 @@ Adding an analysis is two steps: drop `sections/my_thing.py` with `def compute(c
 - **Mojibake repair.** Instagram exports text as Latin-1-encoded UTF-8; every string is repaired with **ftfy** (plus targeted recovery for short ambiguous strings ftfy abstains on) so diacritics render correctly.
 - **Timezone.** UTC millisecond timestamps are converted to your configured IANA timezone before any hour/weekday analysis.
 - **System messages.** Auto-generated lines ("X sent an attachment", "Reacted to your message", group-membership notices) are detected and excluded from language and sentiment analysis; reactions are counted from the reactions table to avoid double-counting.
-- **Sentiment.** `cardiffnlp/twitter-xlm-roberta-base-sentiment` (multilingual, social-media fine-tuned); `compound = P(pos) - P(neg)`. The model leans neutral/negative on terse, ironic chat in smaller languages, so read scores comparatively (between chats, across time) rather than as absolute truth.
+- **Sentiment.** The default `kinit/slovakbert-sentiment-twitter` (SlovakBERT fine-tuned on ~50k annotated Slovak tweets) is chosen for Slovak chat; `compound = P(pos) - P(neg)`. Pick a model that matches your language via `sentiment_model` (see [Configuration](#configuration)) — any open-source 3-class HF text-classification model works, or use your own. Sentiment still leans neutral/negative on terse, ironic chat, so read scores comparatively (between chats, across time) rather than as absolute truth.
 - **Rolling-window logs.** Several export files only cover a recent window (typically ~30 days): feed impressions, the reels watch log, the in-app link history. Charts built from them label the window explicitly; do not extrapolate them to all time.
 - **Survivorship bias.** The followers list only contains people who follow you *now*, with their original follow dates. Anyone who unfollowed has vanished from history, so "follower growth" curves systematically understate early churn.
 - **ML.** Topics = TF-IDF + NMF; chat clustering = K-means on standardized behavioural features plus a PCA projection; reply time and initiation from intra-thread turn-taking gaps; slang = accent-insensitive lexicon match.
@@ -176,7 +190,7 @@ Adding an analysis is two steps: drop `sections/my_thing.py` with `def compute(c
 | Stopwords | **stopwords-iso** |
 | Emoji parsing | **emoji** |
 | Transliteration / de-accent | **unidecode** |
-| Sentiment | **transformers** (XLM-RoBERTa) on **PyTorch** (MPS/CUDA/CPU) |
+| Sentiment | **transformers** (SlovakBERT by default; any 3-class model) on **PyTorch** (MPS/CUDA/CPU) |
 | Topics / clustering | **scikit-learn** (TF-IDF, NMF, KMeans, PCA) |
 | Word clouds | **wordcloud** · Charts: **Plotly** |
 

@@ -26,12 +26,13 @@ from .context import AnalysisContext
 from .sections import (overview, temporal, people, examples, length, dynamics,
                        emoji, language, slang, clusters, sentiment, activity,
                        interests, connections, content, stories, footprint,
-                       security)
+                       security, writing)
 
 SECTIONS = [
     overview, temporal,
     people,          # -> ctx.chats, ctx.title_map
     examples, length,
+    writing,         # style fingerprint + longest messages (uses ctx.title_map)
     dynamics,        # -> ctx.per_chat_resp
     emoji, language, slang,
     clusters,        # uses ctx.chats + ctx.per_chat_resp

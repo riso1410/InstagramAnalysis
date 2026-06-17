@@ -73,5 +73,37 @@ def compute(ctx, D):
         topics.sort(key=lambda t: t["size"], reverse=True)
         D["topics"] = topics
         print(f"  {k} topics over {len(docs):,} docs")
+
+        # 3D word/topic clusters: each term is a point in topic-loading space
+        # (its column of H), projected to 3D via PCA and coloured by the topic
+        # it loads on most strongly. Words near each other are used in the
+        # same contexts — a semantic "vocabulary galaxy".
+        try:
+            from sklearn.decomposition import PCA
+            V = H.T                                   # (n_terms, k) topic loadings
+            keep = [j for j in range(len(terms))
+                    if V[j].sum() > 0 and not blocked(terms[j])]
+            # most salient terms by peak topic loading, capped for a legible scene
+            keep.sort(key=lambda j: V[j].max(), reverse=True)
+            keep = keep[:240]
+            if len(keep) >= 12:
+                Vk = V[keep]
+                dom = Vk.argmax(1)
+                Vn = Vk / np.linalg.norm(Vk, axis=1, keepdims=True)  # direction only
+                ncomp = min(3, Vn.shape[1])
+                proj = PCA(n_components=ncomp, random_state=42).fit_transform(Vn)
+                pts = [{"word": terms[keep[i]],
+                        "x": float(proj[i, 0]), "y": float(proj[i, 1]),
+                        "z": float(proj[i, 2]) if ncomp > 2 else 0.0,
+                        "topic": int(dom[i]),
+                        "weight": float(Vk[i].max())}
+                       for i in range(len(keep))]
+                # one representative top term per topic, for legend labels
+                labels = [t["terms"][0] if t["terms"] else f"topic {t['id']}"
+                          for t in sorted(topics, key=lambda t: t["id"])]
+                D["word_clusters"] = {"k": k, "points": pts, "labels": labels}
+                print(f"  word/topic 3D clusters: {len(pts)} terms")
+        except Exception as e:
+            print("  word clustering failed:", e)
     except Exception as e:
         print("  topic modelling failed:", e)

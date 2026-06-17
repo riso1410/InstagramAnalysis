@@ -68,4 +68,7 @@ timezone: "Europe/Bratislava"   # your local timezone (IANA name) for all charts
 min_chat_messages: 1        # min messages for a chat to appear in per-chat charts
 topics_k: 12                # number of NMF latent topics
 top_chats: 60               # how many chats to keep in the ledger / data
-sentiment_model: "cardiffnlp/twitter-xlm-roberta-base-sentiment"
+# Sentiment model (any 3-class HF text-classification model: neg/neu/pos or -1/0/1).
+# Default is Slovak-specific. For other languages pick an open-source model that
+# matches yours, e.g. cardiffnlp/twitter-xlm-roberta-base-sentiment (multilingual).
+sentiment_model: "kinit/slovakbert-sentiment-twitter"
